@@ -140,4 +140,44 @@ public class GoTrueClient {
         if (jwt == null) return;
         api.signOut(currentAuth.getAccessToken());
     }
+
+    /**
+     * Get the settings from the gotrue server.
+     *
+     * @return settings from the gotrue server.
+     * @throws RestClientResponseException
+     */
+    public SettingsDto settings() throws RestClientResponseException {
+        return api.getSettings();
+    }
+
+    /**
+     * Generates a new JWT, for current user.
+     *
+     * @return The updated information with the refreshed token
+     */
+    public AuthenticationDto refresh() throws RestClientResponseException {
+        return api.refreshAccessToken(currentAuth.getRefreshToken());
+    }
+
+    /**
+     * Gets details about the user.
+     *
+     * @param jwt A valid, logged-in JWT.
+     * @return UserDto details about the user.
+     */
+    public UserDto getUser(String jwt) throws RestClientResponseException {
+        return api.getUser(jwt);
+    }
+
+
+    /**
+     * Generates a new JWT.
+     *
+     * @param refreshToken A valid refresh token that was returned on login.
+     * @return The updated information with the refreshed token
+     */
+    public AuthenticationDto refresh(String refreshToken) throws RestClientResponseException {
+        return api.refreshAccessToken(refreshToken);
+    }
 }

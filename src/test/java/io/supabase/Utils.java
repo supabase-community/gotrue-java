@@ -1,6 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
+import io.supabase.data.dto.SettingsDto;
 import io.supabase.data.dto.UserDto;
 import io.supabase.data.dto.UserUpdatedDto;
 import org.junit.jupiter.api.Assertions;
@@ -66,5 +67,12 @@ public class Utils {
         Assertions.assertNotNull(user.getConfirmedAt());
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getUpdatedAt());
+    }
+
+    protected static void assertSettingsDto(SettingsDto s){
+        Assertions.assertNotNull(s);
+        Assertions.assertNotNull(s.getAutoconfirm());
+        Assertions.assertNotNull(s.getExternal());
+        Assertions.assertNotNull(s.getDisableSignup());
     }
 }

@@ -1,14 +1,12 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
-import io.supabase.data.dto.CredentialsDto;
-import io.supabase.data.dto.UserAttributesDto;
-import io.supabase.data.dto.UserUpdatedDto;
+import io.supabase.data.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Field;
@@ -203,5 +201,56 @@ public class GoTrueClientTest {
         String jwt = r.getAccessToken();
 
         Assertions.assertDoesNotThrow(() -> client.signOut(jwt));
+    }
+
+    @Test
+    void getSettings() {
+        SettingsDto s = client.settings();
+        Utils.assertSettingsDto(s);
+    }
+
+    @Test
+    void refresh() {
+        // create a user to get a valid refreshToken
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+        String token = r.getRefreshToken();
+
+        AuthenticationDto a = client.refresh(token);
+        Utils.assertAuthDto(a);
+        Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
+        Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
+    }
+
+    @Test
+    void refresh_current() {
+        // create a user to get a valid refreshToken
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+
+        AuthenticationDto a = client.refresh();
+        Utils.assertAuthDto(a);
+        Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
+        Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
+    }
+
+    @Test
+    void refresh_invalid() {
+        String token = "noValidToken";
+        Assertions.assertThrows(RestClientResponseException.class, () -> client.refresh(token));
+    }
+
+    @Test
+    void getUser() {
+        // create a user to get a valid JWT
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+        String jwt = r.getAccessToken();
+
+        UserDto user = client.getUser(jwt);
+        Utils.assertUserDto(user);
+    }
+
+    @Test
+    void getUser_invalidJWT() {
+        String jwt = "somethingThatIsNotAValidJWT";
+        Assertions.assertThrows(RestClientResponseException.class, () -> client.getUser(jwt));
     }
 }

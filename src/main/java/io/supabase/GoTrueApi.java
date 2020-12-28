@@ -19,6 +19,17 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+    /**
+     * Get the settings from the gotrue server.
+     *
+     * @return settings from the gotrue server.
+     * @throws RestClientResponseException
+     */
+    public SettingsDto getSettings() throws RestClientResponseException {
+        String _url = String.format("%s/settings", url);
+
+        return RestUtils.get(SettingsDto.class, headers, _url);
+    }
 
     /**
      * Generates the relevant login URL for a third-party provider.

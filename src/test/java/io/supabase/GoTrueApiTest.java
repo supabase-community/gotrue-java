@@ -166,4 +166,10 @@ public class GoTrueApiTest {
         Assertions.assertTrue(url.endsWith("/authorize?provider=Github"));
     }
 
+    @Test
+    void getSettings() {
+        SettingsDto s = api.getSettings();
+        Utils.assertSettingsDto(s);
+    }
+
 }
