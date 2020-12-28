@@ -4,6 +4,7 @@ import io.supabase.data.dto.AuthenticationDto;
 import io.supabase.data.dto.CredentialsDto;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GoTrueApi {
@@ -15,6 +16,18 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+    /**
+     * Removes a logged-in session.
+     *
+     * @param jwt A valid, logged-in JWT.
+     * @throws RestClientResponseException
+     */
+    public void signOut(String jwt) throws RestClientResponseException {
+        String urlLogout = String.format("%s/logout", url);
+        Map<String, String> _headers = new HashMap<>(headers);
+        _headers.put("Authorization", String.format("Bearer %s", jwt));
+        RestUtils.post(_headers, urlLogout);
+    }
 
     /**
      * Logs in an existing user using their email address.

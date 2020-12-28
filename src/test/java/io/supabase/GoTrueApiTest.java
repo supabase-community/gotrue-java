@@ -68,4 +68,19 @@ public class GoTrueApiTest {
         // login with said user
         Assertions.assertThrows(RestClientResponseException.class, () -> api.signInWithEmail("email@example.com", "notSecret"));
     }
+
+    @Test
+    void testSignOut() {
+        // create a user to get a valid JWT
+        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+        String jwt = r.getAccessToken();
+
+        Assertions.assertDoesNotThrow(() -> api.signOut(jwt));
+    }
+
+    @Test
+    void testSignOut_invalidJWT() {
+        String jwt = "somethingThatIsNotAValidJWT";
+        Assertions.assertThrows(RestClientResponseException.class, () -> api.signOut(jwt));
+    }
 }
