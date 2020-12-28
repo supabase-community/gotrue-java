@@ -1,21 +1,12 @@
 package io.supabase;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.supabase.data.dto.CredentialsDto;
 import io.supabase.data.dto.AuthenticationDto;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import io.supabase.data.dto.CredentialsDto;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GoTrueApi {
-    private final ObjectMapper mapper = new ObjectMapper();
     protected String url;
     protected Map<String, String> headers;
 
@@ -23,6 +14,7 @@ public class GoTrueApi {
         this.url = url;
         this.headers = headers;
     }
+
 
     /**
      * Logs in an existing user using their email address.
@@ -32,7 +24,7 @@ public class GoTrueApi {
      * @return SignUpResponseDto
      * @throws RestClientResponseException
      */
-    public AuthenticationDto signInWithEmail(String email, String password) {
+    public AuthenticationDto signInWithEmail(String email, String password) throws RestClientResponseException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
@@ -47,25 +39,9 @@ public class GoTrueApi {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws RestClientResponseException {
-        String urlSignup = String.format("%s/token?grant_type=password", url);
-        RestTemplate rest = new RestTemplate();
-        try {
-            // create entity with the given credentials and headers
-            HttpEntity entity = toEntity(credentials);
-            AuthenticationDto responseDto = rest.postForObject(urlSignup, entity, AuthenticationDto.class);
-            return responseDto;
-        } catch (RestClientResponseException e) {
-            Logger.getGlobal().log(Level.WARNING, String.format("signIn failed: %s", e.getMessage()));
-            if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
-                Logger.getGlobal().log(Level.INFO, String.format("signIn failed : %s", e.getMessage()));
-                throw e;
-            } else {
-                Logger.getGlobal().log(Level.WARNING, String.format("signIn failed: %s", e.getMessage()));
-            }
-        } catch (JsonProcessingException e) {
-            Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
-        }
-        return null;
+        String urlSignIn = String.format("%s/token?grant_type=password", url);
+        AuthenticationDto authenticationDto = RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignIn);
+        return authenticationDto;
     }
 
     /**
@@ -76,7 +52,7 @@ public class GoTrueApi {
      * @return SignUpResponseDto
      * @throws RestClientResponseException
      */
-    public AuthenticationDto signUpWithEmail(String email, String password) {
+    public AuthenticationDto signUpWithEmail(String email, String password) throws RestClientResponseException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
@@ -92,29 +68,8 @@ public class GoTrueApi {
      */
     public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws RestClientResponseException {
         String urlSignup = String.format("%s/signup", url);
-        RestTemplate rest = new RestTemplate();
-        try {
-            HttpEntity entity = toEntity(credentials);
-            AuthenticationDto responseDto = rest.postForObject(urlSignup, entity, AuthenticationDto.class);
-            return responseDto;
-        } catch (RestClientResponseException e) {
-            if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
-                Logger.getGlobal().log(Level.INFO, String.format("signup failed : %s", e.getMessage()));
-                throw e;
-            } else {
-                Logger.getGlobal().log(Level.WARNING, String.format("signup failed: %s", e.getMessage()));
-            }
-        } catch (JsonProcessingException e) {
-            Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
-        }
-        return null;
-    }
-
-    private HttpEntity toEntity(Object object) throws JsonProcessingException {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        headers.forEach((k, v) -> httpHeaders.add(k, v));
-        HttpEntity entity = new HttpEntity(mapper.writeValueAsString(object), httpHeaders);
-        return entity;
+        AuthenticationDto authenticationDto = RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
+        return authenticationDto;
     }
 
 }
