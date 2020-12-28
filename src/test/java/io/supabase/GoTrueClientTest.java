@@ -2,14 +2,27 @@ package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
 import io.supabase.data.dto.CredentialsDto;
+import io.supabase.data.dto.UserAttributesDto;
+import io.supabase.data.dto.UserUpdatedDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GoTrueClientTest {
+    private final String url = "http://localhost:9999";
+
+    @AfterEach
+    void tearDown() {
+        // to ensure that the tests dont affect each other
+        RestTemplate rest = new RestTemplate();
+        rest.delete("http://localhost:3000/users");
+    }
+
     @Test
     void testLoadProperties_no_url() {
         // no env vars nor system properties
@@ -18,7 +31,7 @@ public class GoTrueClientTest {
 
     @Test
     void testLoadProperties() {
-        System.setProperty("gotrue.url", "http://localhost:9999");
+        System.setProperty("gotrue.url", url);
         Assertions.assertDoesNotThrow(() -> new GoTrueClient());
 
         try {
@@ -42,7 +55,7 @@ public class GoTrueClientTest {
     void testLoadProperties_env() {
         try {
             Utils.setEnv(new HashMap<>() {{
-                put("GOTRUE_URL", "http://localhost:9999");
+                put("GOTRUE_URL", url);
                 put("GOTRUE_HEADERS", "SomeHeader=SomeValue, Another=3");
             }});
             Assertions.assertDoesNotThrow(() -> new GoTrueClient());
@@ -64,14 +77,14 @@ public class GoTrueClientTest {
 
     @Test
     void testSignUpWithEmail() {
-        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        GoTrueClient c = new GoTrueClient(url);
         AuthenticationDto r = c.signUp("email@example.com", "secret");
         Utils.assertAuthDto(r);
     }
 
     @Test
     void testSignUpWithEmail_creds() {
-        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        GoTrueClient c = new GoTrueClient(url);
         CredentialsDto creds = new CredentialsDto();
         creds.setEmail("email@example.com");
         creds.setPassword("secret");
@@ -82,7 +95,7 @@ public class GoTrueClientTest {
 
     @Test
     void testSignInWithEmail() {
-        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        GoTrueClient c = new GoTrueClient(url);
         // create a user
         c.signUp("email@example.com", "secret");
         // login with said user
@@ -92,7 +105,7 @@ public class GoTrueClientTest {
 
     @Test
     void testSignInWithEmail_creds() {
-        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        GoTrueClient c = new GoTrueClient(url);
         CredentialsDto creds = new CredentialsDto();
         creds.setEmail("email@example.com");
         creds.setPassword("secret");
@@ -102,5 +115,33 @@ public class GoTrueClientTest {
         // login with said user
         AuthenticationDto r = c.signIn(creds);
         Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void testUpdateUser_email() {
+        GoTrueClient c = new GoTrueClient(url);
+        // create a user
+        AuthenticationDto r = c.signUp("email@example.com", "secret");
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setEmail("newemail@example.com");
+
+        UserUpdatedDto user = c.update(attr);
+        Utils.assertUserUpdatedDto(user);
+        Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
+    }
+
+    @Test
+    void testUpdateUser_email_jwt_given() {
+        GoTrueClient c = new GoTrueClient(url);
+        // create a user
+        AuthenticationDto r = c.signUp("email@example.com", "secret");
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setEmail("newemail@example.com");
+
+        UserUpdatedDto user = c.update(r.getAccessToken(), attr);
+        Utils.assertUserUpdatedDto(user);
+        Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
 }

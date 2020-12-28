@@ -35,7 +35,7 @@ public class GoTrueApi {
      * @param attributesDto The data you want to update
      * @return
      */
-    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) {
+    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws RestClientResponseException {
         String _url = String.format("%s/user", url);
 
         return RestUtils.put(attributesDto, UserUpdatedDto.class, headersWithJWT(jwt), _url);
@@ -47,7 +47,7 @@ public class GoTrueApi {
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
      */
-    public AuthenticationDto refreshAccessToken(String refreshToken) {
+    public AuthenticationDto refreshAccessToken(String refreshToken) throws RestClientResponseException {
         String _url = String.format("%s/token?grant_type=refresh_token", url);
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
         refreshTokenDto.setRefreshToken(refreshToken);
@@ -61,7 +61,7 @@ public class GoTrueApi {
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
      */
-    public UserDto getUser(String jwt) {
+    public UserDto getUser(String jwt) throws RestClientResponseException {
         String _url = String.format("%s/user", url);
 
         return RestUtils.get(UserDto.class, headersWithJWT(jwt), _url);

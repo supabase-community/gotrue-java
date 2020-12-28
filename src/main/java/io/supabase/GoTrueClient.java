@@ -1,7 +1,6 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
-import io.supabase.data.dto.CredentialsDto;
+import io.supabase.data.dto.*;
 import io.supabase.utils.ClientUtils;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -11,6 +10,7 @@ public class GoTrueClient {
     private final GoTrueApi api;
     private final String url;
     private final Map<String, String> headers;
+    private AuthenticationDto currentAuth;
 
     public GoTrueClient(String url, Map<String, String> headers) {
         this.url = url != null ? url : ClientUtils.loadUrl();
@@ -36,6 +36,16 @@ public class GoTrueClient {
         api = new GoTrueApi(url, headers);
     }
 
+
+    /**
+     * Gets the currently logged in user.
+     *
+     * @return Details of the current user.
+     */
+    public UserDto getCurrentUser() {
+        return currentAuth.getUser();
+    }
+
     /**
      * Logs in an existing user using their email address.
      *
@@ -45,7 +55,8 @@ public class GoTrueClient {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signIn(String email, String password) throws RestClientResponseException {
-        return api.signInWithEmail(email, password);
+        currentAuth = api.signInWithEmail(email, password);
+        return currentAuth;
     }
 
     /**
@@ -56,7 +67,8 @@ public class GoTrueClient {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signIn(CredentialsDto credentials) throws RestClientResponseException {
-        return api.signInWithEmail(credentials);
+        currentAuth = api.signInWithEmail(credentials);
+        return currentAuth;
     }
 
     /**
@@ -68,7 +80,8 @@ public class GoTrueClient {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signUp(String email, String password) throws RestClientResponseException {
-        return api.signUpWithEmail(email, password);
+        currentAuth = api.signUpWithEmail(email, password);
+        return currentAuth;
     }
 
     /**
@@ -79,6 +92,31 @@ public class GoTrueClient {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signUp(CredentialsDto credentials) throws RestClientResponseException {
-        return api.signUpWithEmail(credentials);
+        currentAuth = api.signUpWithEmail(credentials);
+        return currentAuth;
+    }
+
+    /**
+     * Update the currently logged in user
+     *
+     * @param attributes The data you want to update
+     * @return
+     */
+    public UserUpdatedDto update(UserAttributesDto attributes) throws RestClientResponseException {
+        if (currentAuth == null) return null;
+        return api.updateUser(currentAuth.getAccessToken(), attributes);
+    }
+
+    /**
+     * Update attributes of given user.
+     *
+     * @param jwt        of the user you want to update.
+     * @param attributes The data you want to update
+     * @return
+     * @throws RestClientResponseException
+     */
+    public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws RestClientResponseException {
+        if (jwt == null) return null;
+        return api.updateUser(jwt, attributes);
     }
 }
