@@ -253,4 +253,12 @@ public class GoTrueClientTest {
         String jwt = "somethingThatIsNotAValidJWT";
         Assertions.assertThrows(RestClientResponseException.class, () -> client.getUser(jwt));
     }
+
+    @Test
+    void getCurrentUser() {
+        // create a user
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+        UserDto user = client.getCurrentUser();
+        Assertions.assertEquals(r.getUser(), user);
+    }
 }
