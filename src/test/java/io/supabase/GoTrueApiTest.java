@@ -32,13 +32,7 @@ public class GoTrueApiTest {
     @Test
     void testSignUpWithEmail() {
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
-        Assertions.assertNotNull(r);
-        Assertions.assertNotNull(r.getAccessToken());
-        Assertions.assertTrue(r.getExpiresIn() > 0);
-        Assertions.assertNotNull(r.getRefreshToken());
-        Assertions.assertNotNull(r.getTokenType());
-        Assertions.assertNotNull(r.getUser());
-        Assertions.assertNotNull(r.getUser().getId());
+        assertAuthDto(r);
     }
 
     @Test
@@ -53,13 +47,7 @@ public class GoTrueApiTest {
         api.signUpWithEmail("email@example.com", "secret");
         // login with said user
         AuthenticationDto r = api.signInWithEmail("email@example.com", "secret");
-        Assertions.assertNotNull(r);
-        Assertions.assertNotNull(r.getAccessToken());
-        Assertions.assertTrue(r.getExpiresIn() > 0);
-        Assertions.assertNotNull(r.getRefreshToken());
-        Assertions.assertNotNull(r.getTokenType());
-        Assertions.assertNotNull(r.getUser());
-        Assertions.assertNotNull(r.getUser().getId());
+        assertAuthDto(r);
     }
 
     @Test
@@ -92,6 +80,45 @@ public class GoTrueApiTest {
         String jwt = r.getAccessToken();
 
         UserDto user = api.getUser(jwt);
+        assertUserDto(user);
+    }
+
+    @Test
+    void testGetUser_invalidJWT() {
+        String jwt = "somethingThatIsNotAValidJWT";
+        Assertions.assertThrows(RestClientResponseException.class, () -> api.getUser(jwt));
+    }
+
+    @Test
+    void testRefreshAccessToken() {
+        // create a user to get a valid refreshToken
+        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+        String token = r.getRefreshToken();
+
+        AuthenticationDto a = api.refreshAccessToken(token);
+        assertAuthDto(a);
+        Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
+        Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
+    }
+
+    @Test
+    void testRefreshAccessToken_invalidToken() {
+        String token = "noValidToken";
+        Assertions.assertThrows(RestClientResponseException.class, () -> api.refreshAccessToken(token));
+    }
+
+    void assertAuthDto(AuthenticationDto dto) {
+        Assertions.assertNotNull(dto);
+        Assertions.assertNotNull(dto.getAccessToken());
+        Assertions.assertTrue(dto.getExpiresIn() > 0);
+        Assertions.assertNotNull(dto.getRefreshToken());
+        Assertions.assertNotNull(dto.getTokenType());
+        Assertions.assertNotNull(dto.getUser());
+        Assertions.assertNotNull(dto.getUser().getId());
+        assertUserDto(dto.getUser());
+    }
+
+    void assertUserDto(UserDto user) {
         Assertions.assertNotNull(user);
         Assertions.assertNotNull(user.getId());
         Assertions.assertNotNull(user.getAud());
@@ -102,11 +129,5 @@ public class GoTrueApiTest {
         Assertions.assertNotNull(user.getConfirmedAt());
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getUpdatedAt());
-    }
-
-    @Test
-    void testGetUser_invalidJWT() {
-        String jwt = "somethingThatIsNotAValidJWT";
-        Assertions.assertThrows(RestClientResponseException.class, () -> api.getUser(jwt));
     }
 }

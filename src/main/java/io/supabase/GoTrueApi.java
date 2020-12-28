@@ -2,6 +2,7 @@ package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
 import io.supabase.data.dto.CredentialsDto;
+import io.supabase.data.dto.RefreshTokenDto;
 import io.supabase.data.dto.UserDto;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -17,6 +18,19 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+    /**
+     * Generates a new JWT
+     *
+     * @param refreshToken A valid refresh token that was returned on login.
+     * @return The updated information with the refreshed token
+     */
+    public AuthenticationDto refreshAccessToken(String refreshToken) {
+        String _url = String.format("%s/token?grant_type=refresh_token", url);
+        RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
+        refreshTokenDto.setRefreshToken(refreshToken);
+
+        return RestUtils.post(refreshTokenDto, AuthenticationDto.class, headers, _url);
+    }
 
     /**
      * Gets details about the user.
