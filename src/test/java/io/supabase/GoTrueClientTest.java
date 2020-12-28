@@ -6,6 +6,7 @@ import io.supabase.data.dto.UserAttributesDto;
 import io.supabase.data.dto.UserUpdatedDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,6 +16,13 @@ import java.util.Map;
 
 public class GoTrueClientTest {
     private final String url = "http://localhost:9999";
+
+    @BeforeEach
+    void setup() {
+        // to ensure that there is nothing specified
+        System.clearProperty("gotrue.url");
+        System.clearProperty("gotrue.headers");
+    }
 
     @AfterEach
     void tearDown() {
@@ -27,6 +35,34 @@ public class GoTrueClientTest {
     void testLoadProperties_no_url() {
         // no env vars nor system properties
         Assertions.assertThrows(RuntimeException.class, () -> new GoTrueClient());
+    }
+
+    @Test
+    void testContructor() {
+        Assertions.assertThrows(RuntimeException.class, () -> new GoTrueClient());
+    }
+
+    @Test
+    void testContructor_url() {
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url));
+    }
+
+    @Test
+    void testContructor_url_headers() {
+        Map<String, String> headers = new HashMap<>() {{
+            put("SomeHeader", "SomeValue");
+            put("Another", "3");
+        }};
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url, headers));
+    }
+
+    @Test
+    void testContructor_headers() {
+        Map<String, String> headers = new HashMap<>() {{
+            put("SomeHeader", "SomeValue");
+            put("Another", "3");
+        }};
+        Assertions.assertThrows(RuntimeException.class, () -> new GoTrueClient(headers));
     }
 
     @Test

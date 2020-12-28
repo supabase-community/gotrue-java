@@ -1,10 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,6 +17,13 @@ public class GoTrueApiTest {
     @BeforeAll
     static void setup() {
         api = new GoTrueApi(url, headers);
+    }
+
+    @BeforeEach
+    void setupEach() {
+        // to ensure that there is nothing specified
+        System.clearProperty("gotrue.url");
+        System.clearProperty("gotrue.headers");
     }
 
     @AfterEach
