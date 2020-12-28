@@ -1,9 +1,6 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
-import io.supabase.data.dto.CredentialsDto;
-import io.supabase.data.dto.RefreshTokenDto;
-import io.supabase.data.dto.UserDto;
+import io.supabase.data.dto.*;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.HashMap;
@@ -16,6 +13,18 @@ public class GoTrueApi {
     public GoTrueApi(String url, Map<String, String> headers) {
         this.url = url;
         this.headers = headers;
+    }
+
+
+    /**
+     * @param jwt           A valid JWT.
+     * @param attributesDto The data you want to update
+     * @return
+     */
+    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) {
+        String _url = String.format("%s/user", url);
+
+        return RestUtils.put(attributesDto, UserUpdatedDto.class, headersWithJWT(jwt), _url);
     }
 
     /**

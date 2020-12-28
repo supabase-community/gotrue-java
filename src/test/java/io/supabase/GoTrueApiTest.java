@@ -1,7 +1,9 @@
 package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
+import io.supabase.data.dto.UserAttributesDto;
 import io.supabase.data.dto.UserDto;
+import io.supabase.data.dto.UserUpdatedDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -107,6 +109,33 @@ public class GoTrueApiTest {
         Assertions.assertThrows(RestClientResponseException.class, () -> api.refreshAccessToken(token));
     }
 
+    @Test
+    void testUpdateUser_email() {
+        // create a user
+        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setEmail("newemail@example.com");
+
+        UserUpdatedDto user = api.updateUser(r.getAccessToken(), attr);
+        assertUserUpdatedDto(user);
+        Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
+    }
+
+    @Test
+    void testUpdateUser_password() {
+        // create a user
+        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setPassword("pass");
+
+        UserUpdatedDto user = api.updateUser(r.getAccessToken(), attr);
+
+        // normal assert because there is no new email
+        assertUserDto(user);
+    }
+
     void assertAuthDto(AuthenticationDto dto) {
         Assertions.assertNotNull(dto);
         Assertions.assertNotNull(dto.getAccessToken());
@@ -116,6 +145,12 @@ public class GoTrueApiTest {
         Assertions.assertNotNull(dto.getUser());
         Assertions.assertNotNull(dto.getUser().getId());
         assertUserDto(dto.getUser());
+    }
+
+    void assertUserUpdatedDto(UserUpdatedDto user) {
+        Assertions.assertNotNull(user.getNewEmail());
+        Assertions.assertNotNull(user.getEmailChangeSentAt());
+        assertUserDto(user);
     }
 
     void assertUserDto(UserDto user) {

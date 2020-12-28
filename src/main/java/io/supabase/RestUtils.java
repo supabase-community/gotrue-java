@@ -2,7 +2,10 @@ package io.supabase;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,6 +15,21 @@ import java.util.logging.Logger;
 
 public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) {
+        RestTemplate rest = new RestTemplate();
+        try {
+            HttpEntity entity = toEntity(body, headers);
+
+            return rest.exchange(url, HttpMethod.PUT, entity, responseClass).getBody();
+        } catch (RestClientResponseException e) {
+            Logger.getGlobal().log(Level.WARNING, String.format("Put failed : %s", e.getMessage()));
+            throw e;
+        } catch (JsonProcessingException e) {
+            Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
+        }
+        return null;
+    }
 
     public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) {
         RestTemplate rest = new RestTemplate();
@@ -42,12 +60,8 @@ public class RestUtils {
             HttpEntity entity = toEntity(body, headers);
             return rest.postForObject(url, entity, responseClass);
         } catch (RestClientResponseException e) {
-            if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
-                Logger.getGlobal().log(Level.INFO, String.format("Post failed : %s", e.getMessage()));
-                throw e;
-            } else {
-                Logger.getGlobal().log(Level.WARNING, String.format("Post failed: %s", e.getMessage()));
-            }
+            Logger.getGlobal().log(Level.INFO, String.format("Post failed : %s", e.getMessage()));
+            throw e;
         } catch (JsonProcessingException e) {
             Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
         }
