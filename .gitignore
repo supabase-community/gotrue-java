@@ -4,3 +4,6 @@
 
 # intellij
 .idea/
+
+# compiled stuff
+target/
