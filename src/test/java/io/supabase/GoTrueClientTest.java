@@ -79,4 +79,28 @@ public class GoTrueClientTest {
         AuthenticationDto r = c.signUp(creds);
         Utils.assertAuthDto(r);
     }
+
+    @Test
+    void testSignInWithEmail() {
+        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        // create a user
+        c.signUp("email@example.com", "secret");
+        // login with said user
+        AuthenticationDto r = c.signIn("email@example.com", "secret");
+        Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void testSignInWithEmail_creds() {
+        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        CredentialsDto creds = new CredentialsDto();
+        creds.setEmail("email@example.com");
+        creds.setPassword("secret");
+
+        // create a user
+        c.signUp(creds);
+        // login with said user
+        AuthenticationDto r = c.signIn(creds);
+        Utils.assertAuthDto(r);
+    }
 }

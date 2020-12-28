@@ -37,6 +37,29 @@ public class GoTrueClient {
     }
 
     /**
+     * Logs in an existing user using their email address.
+     *
+     * @param email    The email address of the user.
+     * @param password The password of the user.
+     * @return Details about the authentication.
+     * @throws RestClientResponseException
+     */
+    public AuthenticationDto signIn(String email, String password) throws RestClientResponseException {
+        return api.signInWithEmail(email, password);
+    }
+
+    /**
+     * Logs in an existing user using their email address.
+     *
+     * @param credentials Object with the email and the password of the user.
+     * @return Details about the authentication.
+     * @throws RestClientResponseException
+     */
+    public AuthenticationDto signIn(CredentialsDto credentials) throws RestClientResponseException {
+        return api.signInWithEmail(credentials);
+    }
+
+    /**
      * Creates a new user using their email address.
      *
      * @param email    The email address of the user.
