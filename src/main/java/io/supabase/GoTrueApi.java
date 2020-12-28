@@ -83,7 +83,7 @@ public class GoTrueApi {
      *
      * @param email    The email address of the user.
      * @param password The password of the user.
-     * @return SignUpResponseDto
+     * @return Details about the authentication.
      * @throws RestClientResponseException
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws RestClientResponseException {
@@ -97,7 +97,7 @@ public class GoTrueApi {
      * Logs in an existing user using their email address.
      *
      * @param credentials Object with the email and the password of the user.
-     * @return TokenResponseDto
+     * @return Details about the authentication.
      * @throws RestClientResponseException
      */
     public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws RestClientResponseException {
@@ -111,7 +111,7 @@ public class GoTrueApi {
      *
      * @param email    The email address of the user.
      * @param password The password of the user.
-     * @return SignUpResponseDto
+     * @return Details about the authentication.
      * @throws RestClientResponseException
      */
     public AuthenticationDto signUpWithEmail(String email, String password) throws RestClientResponseException {
@@ -125,7 +125,7 @@ public class GoTrueApi {
      * Creates a new user using their email address.
      *
      * @param credentials Object with the email and the password of the user.
-     * @return SignUpResponseDto
+     * @return Details about the authentication.
      * @throws RestClientResponseException
      */
     public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws RestClientResponseException {

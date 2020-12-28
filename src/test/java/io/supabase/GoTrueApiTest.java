@@ -1,9 +1,6 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
-import io.supabase.data.dto.UserAttributesDto;
-import io.supabase.data.dto.UserDto;
-import io.supabase.data.dto.UserUpdatedDto;
+import io.supabase.data.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +15,7 @@ public class GoTrueApiTest {
     private static final String url = "http://localhost:9999";
     private static final Map<String, String> headers = new HashMap<>();
     private static GoTrueApi api;
+    CredentialsDto creds = new CredentialsDto();
 
     @BeforeAll
     static void setup() {
@@ -34,7 +32,17 @@ public class GoTrueApiTest {
     @Test
     void testSignUpWithEmail() {
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
-        assertAuthDto(r);
+        Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void testSignUpWithEmail_creds() {
+        CredentialsDto creds = new CredentialsDto();
+        creds.setEmail("email@example.com");
+        creds.setPassword("secret");
+
+        AuthenticationDto r = api.signUpWithEmail(creds);
+        Utils.assertAuthDto(r);
     }
 
     @Test
@@ -49,7 +57,19 @@ public class GoTrueApiTest {
         api.signUpWithEmail("email@example.com", "secret");
         // login with said user
         AuthenticationDto r = api.signInWithEmail("email@example.com", "secret");
-        assertAuthDto(r);
+        Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void testSignInWithEmail_creds() {
+        // create a user
+        api.signUpWithEmail("email@example.com", "secret");
+        // login with said user
+        CredentialsDto creds = new CredentialsDto();
+        creds.setEmail("email@example.com");
+        creds.setPassword("secret");
+        AuthenticationDto r = api.signInWithEmail(creds);
+        Utils.assertAuthDto(r);
     }
 
     @Test
@@ -82,7 +102,7 @@ public class GoTrueApiTest {
         String jwt = r.getAccessToken();
 
         UserDto user = api.getUser(jwt);
-        assertUserDto(user);
+        Utils.assertUserDto(user);
     }
 
     @Test
@@ -98,7 +118,7 @@ public class GoTrueApiTest {
         String token = r.getRefreshToken();
 
         AuthenticationDto a = api.refreshAccessToken(token);
-        assertAuthDto(a);
+        Utils.assertAuthDto(a);
         Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
         Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
     }
@@ -118,7 +138,7 @@ public class GoTrueApiTest {
         attr.setEmail("newemail@example.com");
 
         UserUpdatedDto user = api.updateUser(r.getAccessToken(), attr);
-        assertUserUpdatedDto(user);
+        Utils.assertUserUpdatedDto(user);
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
 
@@ -133,44 +153,14 @@ public class GoTrueApiTest {
         UserUpdatedDto user = api.updateUser(r.getAccessToken(), attr);
 
         // normal assert because there is no new email
-        assertUserDto(user);
+        Utils.assertUserDto(user);
     }
 
     @Test
-    void testGetUrlForProvider(){
+    void testGetUrlForProvider() {
         String url = api.getUrlForProvider("Github");
         Assertions.assertNotNull(url);
         Assertions.assertTrue(url.endsWith("/authorize?provider=Github"));
     }
 
-
-    void assertAuthDto(AuthenticationDto dto) {
-        Assertions.assertNotNull(dto);
-        Assertions.assertNotNull(dto.getAccessToken());
-        Assertions.assertTrue(dto.getExpiresIn() > 0);
-        Assertions.assertNotNull(dto.getRefreshToken());
-        Assertions.assertNotNull(dto.getTokenType());
-        Assertions.assertNotNull(dto.getUser());
-        Assertions.assertNotNull(dto.getUser().getId());
-        assertUserDto(dto.getUser());
-    }
-
-    void assertUserUpdatedDto(UserUpdatedDto user) {
-        Assertions.assertNotNull(user.getNewEmail());
-        Assertions.assertNotNull(user.getEmailChangeSentAt());
-        assertUserDto(user);
-    }
-
-    void assertUserDto(UserDto user) {
-        Assertions.assertNotNull(user);
-        Assertions.assertNotNull(user.getId());
-        Assertions.assertNotNull(user.getAud());
-        Assertions.assertNotNull(user.getEmail());
-        Assertions.assertNotNull(user.getCreatedAt());
-        Assertions.assertNotNull(user.getRole());
-        Assertions.assertNotNull(user.getLastSignInAt());
-        Assertions.assertNotNull(user.getConfirmedAt());
-        Assertions.assertNotNull(user.getCreatedAt());
-        Assertions.assertNotNull(user.getUpdatedAt());
-    }
 }

@@ -1,5 +1,7 @@
 package io.supabase;
 
+import io.supabase.data.dto.AuthenticationDto;
+import io.supabase.data.dto.CredentialsDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -60,4 +62,21 @@ public class GoTrueClientTest {
         }
     }
 
+    @Test
+    void testSignUpWithEmail() {
+        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        AuthenticationDto r = c.signUp("email@example.com", "secret");
+        Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void testSignUpWithEmail_creds() {
+        GoTrueClient c = new GoTrueClient("http://localhost:9999");
+        CredentialsDto creds = new CredentialsDto();
+        creds.setEmail("email@example.com");
+        creds.setPassword("secret");
+
+        AuthenticationDto r = c.signUp(creds);
+        Utils.assertAuthDto(r);
+    }
 }
