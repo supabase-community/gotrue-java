@@ -136,6 +136,14 @@ public class GoTrueApiTest {
         assertUserDto(user);
     }
 
+    @Test
+    void testGetUrlForProvider(){
+        String url = api.getUrlForProvider("Github");
+        Assertions.assertNotNull(url);
+        Assertions.assertTrue(url.endsWith("/authorize?provider=Github"));
+    }
+
+
     void assertAuthDto(AuthenticationDto dto) {
         Assertions.assertNotNull(dto);
         Assertions.assertNotNull(dto.getAccessToken());

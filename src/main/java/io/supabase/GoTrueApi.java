@@ -1,6 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
+import io.supabase.utils.RestUtils;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.HashMap;
@@ -11,10 +12,23 @@ public class GoTrueApi {
     protected Map<String, String> headers;
 
     public GoTrueApi(String url, Map<String, String> headers) {
+        if (url == null || url.isEmpty()) {
+            throw new RuntimeException("The GoTrue url is not defined");
+        }
         this.url = url;
         this.headers = headers;
     }
 
+
+    /**
+     * Generates the relevant login URL for a third-party provider.
+     *
+     * @param provider One of the providers supported by GoTrue.
+     * @return
+     */
+    public String getUrlForProvider(String provider) {
+        return String.format("%s/authorize?provider=%s", url, provider);
+    }
 
     /**
      * @param jwt           A valid JWT.
