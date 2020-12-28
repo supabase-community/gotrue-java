@@ -2,6 +2,7 @@ package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
 import io.supabase.data.dto.CredentialsDto;
+import io.supabase.data.dto.UserDto;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.HashMap;
@@ -16,6 +17,19 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+
+    /**
+     * Gets details about the user.
+     *
+     * @param jwt A valid, logged-in JWT.
+     * @return UserDto details about the user.
+     */
+    public UserDto getUser(String jwt) {
+        String _url = String.format("%s/user", url);
+
+        return RestUtils.get(UserDto.class, headersWithJWT(jwt), _url);
+    }
+
     /**
      * Removes a logged-in session.
      *
@@ -23,10 +37,8 @@ public class GoTrueApi {
      * @throws RestClientResponseException
      */
     public void signOut(String jwt) throws RestClientResponseException {
-        String urlLogout = String.format("%s/logout", url);
-        Map<String, String> _headers = new HashMap<>(headers);
-        _headers.put("Authorization", String.format("Bearer %s", jwt));
-        RestUtils.post(_headers, urlLogout);
+        String _url = String.format("%s/logout", url);
+        RestUtils.post(headersWithJWT(jwt), _url);
     }
 
     /**
@@ -52,9 +64,9 @@ public class GoTrueApi {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws RestClientResponseException {
-        String urlSignIn = String.format("%s/token?grant_type=password", url);
-        AuthenticationDto authenticationDto = RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignIn);
-        return authenticationDto;
+        String _url = String.format("%s/token?grant_type=password", url);
+
+        return RestUtils.post(credentials, AuthenticationDto.class, headers, _url);
     }
 
     /**
@@ -80,9 +92,14 @@ public class GoTrueApi {
      * @throws RestClientResponseException
      */
     public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws RestClientResponseException {
-        String urlSignup = String.format("%s/signup", url);
-        AuthenticationDto authenticationDto = RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
-        return authenticationDto;
+        String _url = String.format("%s/signup", url);
+
+        return RestUtils.post(credentials, AuthenticationDto.class, headers, _url);
     }
 
+    private Map<String, String> headersWithJWT(String jwt) {
+        Map<String, String> _headers = new HashMap<>(headers);
+        _headers.put("Authorization", String.format("Bearer %s", jwt));
+        return _headers;
+    }
 }

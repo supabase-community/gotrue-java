@@ -2,9 +2,7 @@ package io.supabase;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +12,18 @@ import java.util.logging.Logger;
 
 public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) {
+        RestTemplate rest = new RestTemplate();
+        try {
+            HttpEntity entity = toEntity(headers);
+            ResponseEntity<R> res = rest.exchange(url, HttpMethod.GET, entity, responseClass);
+            return res.getBody();
+        } catch (RestClientResponseException e) {
+            Logger.getGlobal().log(Level.INFO, String.format("Get failed : %s", e.getMessage()));
+            throw e;
+        }
+    }
 
     public static void post(Map<String, String> headers, String url) {
         RestTemplate rest = new RestTemplate();
@@ -30,8 +40,7 @@ public class RestUtils {
         RestTemplate rest = new RestTemplate();
         try {
             HttpEntity entity = toEntity(body, headers);
-            R res = rest.postForObject(url, entity, responseClass);
-            return res;
+            return rest.postForObject(url, entity, responseClass);
         } catch (RestClientResponseException e) {
             if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
                 Logger.getGlobal().log(Level.INFO, String.format("Post failed : %s", e.getMessage()));
@@ -55,8 +64,7 @@ public class RestUtils {
 
     private static HttpEntity toEntity(String jsonBody, Map<String, String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        headers.forEach((k, v) -> httpHeaders.add(k, v));
-        HttpEntity entity = new HttpEntity(jsonBody, httpHeaders);
-        return entity;
+        headers.forEach(httpHeaders::add);
+        return new HttpEntity(jsonBody, httpHeaders);
     }
 }

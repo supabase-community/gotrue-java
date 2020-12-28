@@ -1,6 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.AuthenticationDto;
+import io.supabase.data.dto.UserDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -82,5 +83,30 @@ public class GoTrueApiTest {
     void testSignOut_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
         Assertions.assertThrows(RestClientResponseException.class, () -> api.signOut(jwt));
+    }
+
+    @Test
+    void testGetUser() {
+        // create a user to get a valid JWT
+        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+        String jwt = r.getAccessToken();
+
+        UserDto user = api.getUser(jwt);
+        Assertions.assertNotNull(user);
+        Assertions.assertNotNull(user.getId());
+        Assertions.assertNotNull(user.getAud());
+        Assertions.assertNotNull(user.getEmail());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getRole());
+        Assertions.assertNotNull(user.getLastSignInAt());
+        Assertions.assertNotNull(user.getConfirmedAt());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getUpdatedAt());
+    }
+
+    @Test
+    void testGetUser_invalidJWT() {
+        String jwt = "somethingThatIsNotAValidJWT";
+        Assertions.assertThrows(RestClientResponseException.class, () -> api.getUser(jwt));
     }
 }
