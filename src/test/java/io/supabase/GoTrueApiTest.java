@@ -12,7 +12,6 @@ public class GoTrueApiTest {
     private static final String url = "http://localhost:9999";
     private static final Map<String, String> headers = new HashMap<>();
     private static GoTrueApi api;
-    CredentialsDto creds = new CredentialsDto();
 
     @BeforeAll
     static void setup() {
@@ -34,13 +33,13 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignUpWithEmail() {
+    void signUpWithEmail() {
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
         Utils.assertAuthDto(r);
     }
 
     @Test
-    void testSignUpWithEmail_creds() {
+    void signUpWithEmail_creds() {
         CredentialsDto creds = new CredentialsDto();
         creds.setEmail("email@example.com");
         creds.setPassword("secret");
@@ -50,13 +49,13 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignUpWithEmail_AlreadyExists() {
-        AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+    void signUpWithEmail_AlreadyExists() {
+        api.signUpWithEmail("email@example.com", "secret");
         Assertions.assertThrows(RestClientResponseException.class, () -> api.signUpWithEmail("email@example.com", "secret"));
     }
 
     @Test
-    void testSignInWithEmail() {
+    void signInWithEmail() {
         // create a user
         api.signUpWithEmail("email@example.com", "secret");
         // login with said user
@@ -65,7 +64,7 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignInWithEmail_creds() {
+    void signInWithEmail_creds() {
         // create a user
         api.signUpWithEmail("email@example.com", "secret");
         // login with said user
@@ -77,7 +76,7 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignInWithEmail_wrongPass() {
+    void signInWithEmail_wrongPass() {
         // create a user
         api.signUpWithEmail("email@example.com", "secret");
         // login with said user
@@ -85,7 +84,7 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignOut() {
+    void signOut() {
         // create a user to get a valid JWT
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
         String jwt = r.getAccessToken();
@@ -94,13 +93,13 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testSignOut_invalidJWT() {
+    void signOut_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
         Assertions.assertThrows(RestClientResponseException.class, () -> api.signOut(jwt));
     }
 
     @Test
-    void testGetUser() {
+    void getUser() {
         // create a user to get a valid JWT
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
         String jwt = r.getAccessToken();
@@ -110,13 +109,13 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testGetUser_invalidJWT() {
+    void getUser_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
         Assertions.assertThrows(RestClientResponseException.class, () -> api.getUser(jwt));
     }
 
     @Test
-    void testRefreshAccessToken() {
+    void refreshAccessToken() {
         // create a user to get a valid refreshToken
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
         String token = r.getRefreshToken();
@@ -128,13 +127,13 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testRefreshAccessToken_invalidToken() {
+    void refreshAccessToken_invalidToken() {
         String token = "noValidToken";
         Assertions.assertThrows(RestClientResponseException.class, () -> api.refreshAccessToken(token));
     }
 
     @Test
-    void testUpdateUser_email() {
+    void updateUser_email() {
         // create a user
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
 
@@ -147,7 +146,7 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testUpdateUser_password() {
+    void updateUser_password() {
         // create a user
         AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
 
@@ -161,7 +160,7 @@ public class GoTrueApiTest {
     }
 
     @Test
-    void testGetUrlForProvider() {
+    void getUrlForProvider() {
         String url = api.getUrlForProvider("Github");
         Assertions.assertNotNull(url);
         Assertions.assertTrue(url.endsWith("/authorize?provider=Github"));

@@ -24,16 +24,18 @@ public class GoTrueApi {
      * Generates the relevant login URL for a third-party provider.
      *
      * @param provider One of the providers supported by GoTrue.
-     * @return
+     * @return the url for the given provider
      */
     public String getUrlForProvider(String provider) {
         return String.format("%s/authorize?provider=%s", url, provider);
     }
 
     /**
+     * Update a user.
+     *
      * @param jwt           A valid JWT.
      * @param attributesDto The data you want to update
-     * @return
+     * @return details of the updated user.
      */
     public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws RestClientResponseException {
         String _url = String.format("%s/user", url);

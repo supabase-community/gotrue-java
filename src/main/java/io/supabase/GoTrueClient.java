@@ -100,7 +100,7 @@ public class GoTrueClient {
      * Update the currently logged in user
      *
      * @param attributes The data you want to update
-     * @return
+     * @return details of the updated user.
      */
     public UserUpdatedDto update(UserAttributesDto attributes) throws RestClientResponseException {
         if (currentAuth == null) return null;
@@ -112,11 +112,32 @@ public class GoTrueClient {
      *
      * @param jwt        of the user you want to update.
      * @param attributes The data you want to update
-     * @return
+     * @return details of the updated user.
      * @throws RestClientResponseException
      */
     public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws RestClientResponseException {
         if (jwt == null) return null;
         return api.updateUser(jwt, attributes);
+    }
+
+    /**
+     * Signs out the current user, if there is a logged in user.
+     *
+     * @throws RestClientResponseException
+     */
+    public void signOut() throws RestClientResponseException {
+        if (currentAuth == null) return;
+        api.signOut(currentAuth.getAccessToken());
+    }
+
+    /**
+     * Signs out the user of the given jwt.
+     *
+     * @param jwt A valid jwt.
+     * @throws RestClientResponseException
+     */
+    public void signOut(String jwt) throws RestClientResponseException {
+        if (jwt == null) return;
+        api.signOut(currentAuth.getAccessToken());
     }
 }

@@ -23,8 +23,8 @@ public class ClientUtils {
             String[] arr = headers.split("[\\s,;-]+");
             if (arr.length > 0) {
                 String[] s;
-                for (int i = 0; i < arr.length; i++) {
-                    s = arr[i].split("[=:]+");
+                for (String value : arr) {
+                    s = value.split("[=:]+");
                     res.put(s[0], s[1]);
                 }
             }

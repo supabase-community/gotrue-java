@@ -2,9 +2,11 @@ package io.supabase.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 public class UserUpdatedDto extends UserDto {
     @JsonProperty("new_email")
