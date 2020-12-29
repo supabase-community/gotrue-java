@@ -1,8 +1,8 @@
 package io.supabase;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.*;
+import io.supabase.data.jwt.ParsedToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 
 public class GoTrueClientTest {
     private final String url = "http://localhost:9999";
@@ -52,7 +54,7 @@ public class GoTrueClientTest {
 
     @Test
     void constructor_url_headers() {
-        Map<String, String> headers = new HashMap<String,String>() {{
+        Map<String, String> headers = new HashMap<String, String>() {{
             put("SomeHeader", "SomeValue");
             put("Another", "3");
         }};
@@ -61,7 +63,7 @@ public class GoTrueClientTest {
 
     @Test
     void constructor_headers() {
-        Map<String, String> headers = new HashMap<String,String>() {{
+        Map<String, String> headers = new HashMap<String, String>() {{
             put("SomeHeader", "SomeValue");
             put("Another", "3");
         }};
@@ -95,10 +97,24 @@ public class GoTrueClientTest {
     @Test
     void loadProperties_env() {
         try {
-            Utils.setEnv(new HashMap<String,String>() {{
-                put("GOTRUE_URL", url);
-                put("GOTRUE_HEADERS", "SomeHeader=SomeValue, Another=3");
-            }});
+            withEnvironmentVariable("GOTRUE_URL", url)
+                    .execute(this::constructorWithEnv_url);
+            withEnvironmentVariable("GOTRUE_HEADERS", "SomeHeader=SomeValue, Another=3")
+                    .execute(this::constructorWithEnv_headers);
+        } catch (Exception e) {
+            Assertions.fail();
+        }
+    }
+
+    void constructorWithEnv_url() {
+        // does not throw -> url is defined
+        Assertions.assertDoesNotThrow((ThrowingSupplier<GoTrueClient>) GoTrueClient::new);
+    }
+
+    void constructorWithEnv_headers() {
+        try {
+            // set url so it doesnt throw
+            System.setProperty("gotrue.url", url);
             Assertions.assertDoesNotThrow((ThrowingSupplier<GoTrueClient>) GoTrueClient::new);
 
             GoTrueClient c = new GoTrueClient();
@@ -112,14 +128,7 @@ public class GoTrueClientTest {
             Assertions.assertEquals(headers.get("SomeHeader"), "SomeValue");
             Assertions.assertTrue(headers.containsKey("Another"));
             Assertions.assertEquals(headers.get("Another"), "3");
-
-            // so it doesnt effect the other tests
-            Utils.setEnv(new HashMap<String,String>() {{
-                put("GOTRUE_URL", null);
-                put("GOTRUE_HEADERS", null);
-            }});
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             Assertions.fail();
         }
     }
