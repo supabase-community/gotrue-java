@@ -1,6 +1,9 @@
 package io.supabase.utils;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.supabase.data.dto.UserMetadataDto;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.JwtSecretNotFoundException;
@@ -43,15 +46,13 @@ public class ClientUtils {
         return res;
     }
 
-    private static Jws<Claims> parseJwt(String jwt, String secret) throws JwtException {
+    private static Jws<Claims> parseJwt(String jwt, String secret) {
         Key hmacKey = new SecretKeySpec(secret.getBytes(),
                 SignatureAlgorithm.HS256.getJcaName());
 
-        Jws<Claims> claims = Jwts.parser()
+        return Jwts.parser()
                 .setSigningKey(hmacKey)
                 .parseClaimsJws(jwt);
-
-        return claims;
     }
 
     private static String getJwtSecret() {
@@ -62,7 +63,7 @@ public class ClientUtils {
         return secret;
     }
 
-    public static ParsedToken parseJwt(String jwt) throws JwtException, JwtSecretNotFoundException {
+    public static ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
         String secret = getJwtSecret();
         if (secret == null) {
             throw new JwtSecretNotFoundException();

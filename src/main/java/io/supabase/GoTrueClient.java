@@ -3,10 +3,10 @@ package io.supabase;
 import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.ClientUtils;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public class GoTrueClient {
      * @return the parsed token.
      * @throws JwtException
      */
-    public ParsedToken parseJwt(String jwt) throws JwtException, JwtSecretNotFoundException {
+    public ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
         return ClientUtils.parseJwt(jwt);
     }
 
@@ -109,9 +109,8 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signIn(String email, String password) throws RestClientResponseException {
+    public AuthenticationDto signIn(String email, String password) throws ApiException {
         currentAuth = api.signInWithEmail(email, password);
         return currentAuth;
     }
@@ -121,9 +120,8 @@ public class GoTrueClient {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signIn(CredentialsDto credentials) throws RestClientResponseException {
+    public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
         currentAuth = api.signInWithEmail(credentials);
         return currentAuth;
     }
@@ -134,9 +132,8 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signUp(String email, String password) throws RestClientResponseException {
+    public AuthenticationDto signUp(String email, String password) throws ApiException {
         currentAuth = api.signUpWithEmail(email, password);
         return currentAuth;
     }
@@ -146,9 +143,8 @@ public class GoTrueClient {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signUp(CredentialsDto credentials) throws RestClientResponseException {
+    public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
         currentAuth = api.signUpWithEmail(credentials);
         return currentAuth;
     }
@@ -159,7 +155,7 @@ public class GoTrueClient {
      * @param attributes The data you want to update
      * @return details of the updated user.
      */
-    public UserUpdatedDto update(UserAttributesDto attributes) throws RestClientResponseException {
+    public UserUpdatedDto update(UserAttributesDto attributes) throws ApiException {
         if (currentAuth == null) return null;
         return api.updateUser(currentAuth.getAccessToken(), attributes);
     }
@@ -170,19 +166,16 @@ public class GoTrueClient {
      * @param jwt        of the user you want to update.
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws RestClientResponseException
      */
-    public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws RestClientResponseException {
+    public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws ApiException {
         if (jwt == null) return null;
         return api.updateUser(jwt, attributes);
     }
 
     /**
      * Signs out the current user, if there is a logged in user.
-     *
-     * @throws RestClientResponseException
      */
-    public void signOut() throws RestClientResponseException {
+    public void signOut() throws ApiException {
         if (currentAuth == null) return;
         api.signOut(currentAuth.getAccessToken());
     }
@@ -191,9 +184,8 @@ public class GoTrueClient {
      * Signs out the user of the given jwt.
      *
      * @param jwt A valid jwt.
-     * @throws RestClientResponseException
      */
-    public void signOut(String jwt) throws RestClientResponseException {
+    public void signOut(String jwt) throws ApiException {
         if (jwt == null) return;
         api.signOut(currentAuth.getAccessToken());
     }
@@ -202,9 +194,8 @@ public class GoTrueClient {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws RestClientResponseException
      */
-    public SettingsDto settings() throws RestClientResponseException {
+    public SettingsDto settings() throws ApiException {
         return api.getSettings();
     }
 
@@ -213,7 +204,7 @@ public class GoTrueClient {
      *
      * @return The updated information with the refreshed token
      */
-    public AuthenticationDto refresh() throws RestClientResponseException {
+    public AuthenticationDto refresh() throws ApiException {
         return api.refreshAccessToken(currentAuth.getRefreshToken());
     }
 
@@ -223,7 +214,7 @@ public class GoTrueClient {
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
      */
-    public UserDto getUser(String jwt) throws RestClientResponseException {
+    public UserDto getUser(String jwt) throws ApiException {
         return api.getUser(jwt);
     }
 
@@ -234,7 +225,7 @@ public class GoTrueClient {
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
      */
-    public AuthenticationDto refresh(String refreshToken) throws RestClientResponseException {
+    public AuthenticationDto refresh(String refreshToken) throws ApiException {
         return api.refreshAccessToken(refreshToken);
     }
 }

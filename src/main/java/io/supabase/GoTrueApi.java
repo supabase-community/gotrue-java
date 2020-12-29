@@ -1,9 +1,9 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
+import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.RestUtils;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +24,11 @@ public class GoTrueApi {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws RestClientResponseException
      */
-    public SettingsDto getSettings() throws RestClientResponseException {
-        String _url = String.format("%s/settings", url);
+    public SettingsDto getSettings() throws ApiException {
+        String urlSettings = String.format("%s/settings", url);
 
-        return RestUtils.get(SettingsDto.class, headers, _url);
+        return RestUtils.get(SettingsDto.class, headers, urlSettings);
     }
 
     /**
@@ -49,10 +48,10 @@ public class GoTrueApi {
      * @param attributesDto The data you want to update
      * @return details of the updated user.
      */
-    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws RestClientResponseException {
-        String _url = String.format("%s/user", url);
+    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws ApiException {
+        String urlUser = String.format("%s/user", url);
 
-        return RestUtils.put(attributesDto, UserUpdatedDto.class, headersWithJWT(jwt), _url);
+        return RestUtils.put(attributesDto, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
     }
 
     /**
@@ -61,12 +60,12 @@ public class GoTrueApi {
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
      */
-    public AuthenticationDto refreshAccessToken(String refreshToken) throws RestClientResponseException {
-        String _url = String.format("%s/token?grant_type=refresh_token", url);
+    public AuthenticationDto refreshAccessToken(String refreshToken) throws ApiException {
+        String urlToken = String.format("%s/token?grant_type=refresh_token", url);
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
         refreshTokenDto.setRefreshToken(refreshToken);
 
-        return RestUtils.post(refreshTokenDto, AuthenticationDto.class, headers, _url);
+        return RestUtils.post(refreshTokenDto, AuthenticationDto.class, headers, urlToken);
     }
 
     /**
@@ -75,21 +74,20 @@ public class GoTrueApi {
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
      */
-    public UserDto getUser(String jwt) throws RestClientResponseException {
-        String _url = String.format("%s/user", url);
+    public UserDto getUser(String jwt) throws ApiException {
+        String urlUser = String.format("%s/user", url);
 
-        return RestUtils.get(UserDto.class, headersWithJWT(jwt), _url);
+        return RestUtils.get(UserDto.class, headersWithJWT(jwt), urlUser);
     }
 
     /**
      * Removes a logged-in session.
      *
      * @param jwt A valid, logged-in JWT.
-     * @throws RestClientResponseException
      */
-    public void signOut(String jwt) throws RestClientResponseException {
-        String _url = String.format("%s/logout", url);
-        RestUtils.post(headersWithJWT(jwt), _url);
+    public void signOut(String jwt) throws ApiException {
+        String urlLogout = String.format("%s/logout", url);
+        RestUtils.post(headersWithJWT(jwt), urlLogout);
     }
 
     /**
@@ -98,9 +96,8 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signInWithEmail(String email, String password) throws RestClientResponseException {
+    public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
@@ -112,12 +109,11 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws RestClientResponseException {
-        String _url = String.format("%s/token?grant_type=password", url);
+    public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
+        String urlToken = String.format("%s/token?grant_type=password", url);
 
-        return RestUtils.post(credentials, AuthenticationDto.class, headers, _url);
+        return RestUtils.post(credentials, AuthenticationDto.class, headers, urlToken);
     }
 
     /**
@@ -126,9 +122,8 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signUpWithEmail(String email, String password) throws RestClientResponseException {
+    public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
@@ -140,17 +135,16 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws RestClientResponseException
      */
-    public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws RestClientResponseException {
-        String _url = String.format("%s/signup", url);
+    public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
+        String urlSignup = String.format("%s/signup", url);
 
-        return RestUtils.post(credentials, AuthenticationDto.class, headers, _url);
+        return RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
     }
 
     private Map<String, String> headersWithJWT(String jwt) {
-        Map<String, String> _headers = new HashMap<>(headers);
-        _headers.put("Authorization", String.format("Bearer %s", jwt));
-        return _headers;
+        Map<String, String> newHeaders = new HashMap<>(headers);
+        newHeaders.put("Authorization", String.format("Bearer %s", jwt));
+        return newHeaders;
     }
 }

@@ -7,7 +7,7 @@ import io.supabase.data.dto.UserUpdatedDto;
 import io.supabase.data.jwt.ParsedToken;
 import org.junit.jupiter.api.Assertions;
 
-public class Utils {
+class Utils {
 
     protected static void assertAuthDto(AuthenticationDto dto) {
         Assertions.assertNotNull(dto);
