@@ -1,4 +1,4 @@
-# `gotrue-java WIP`
+# `gotrue-java WIP` ![Java CI with Maven](https://github.com/ffabss/gotrue-java/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 A Java client library for the [GoTrue](https://github.com/netlify/gotrue) API.
 
