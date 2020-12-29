@@ -1,0 +1,4 @@
+io.supabase
+io.supabase.data.dto
+io.supabase.data.jwt
+io.supabase.utils
