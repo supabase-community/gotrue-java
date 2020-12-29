@@ -3,6 +3,7 @@ package io.supabase;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.UrlNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -308,7 +309,13 @@ public class GoTrueClientTest {
         System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
         // create a user
         AuthenticationDto r = client.signUp("email@example.com", "secret");
-        ParsedToken parsedToken = client.parseJwt(r.getAccessToken());
+        ParsedToken parsedToken = null;
+        try {
+            parsedToken = client.parseJwt(r.getAccessToken());
+        } catch (JwtSecretNotFoundException e) {
+            // should not happen
+            Assertions.fail();
+        }
         Utils.assertParsedToken(parsedToken);
     }
 
@@ -327,7 +334,12 @@ public class GoTrueClientTest {
         // create a user
         AuthenticationDto r = client.signUp("email@example.com", "secret");
 
-        Assertions.assertTrue(client.validate(r.getAccessToken()));
+        try {
+            Assertions.assertTrue(client.validate(r.getAccessToken()));
+        } catch (JwtSecretNotFoundException e) {
+            // should not happen
+            Assertions.fail();
+        }
     }
 
     @Test
@@ -336,6 +348,11 @@ public class GoTrueClientTest {
         // some old token
         String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MDkyMDI4ODMsInN1YiI6ImE5NDJiM2QxLTNhNTItNDQ1Ny04YzRmLTg4ZDA3YzJkYmUzMCIsImVtYWlsIjoiZW1haWxAZXhhbXBsZS5jb20iLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCJ9LCJ1c2VyX21ldGFkYXRhIjpudWxsLCJyb2xlIjoiIn0.-DVqBKAqUkcj59rXWqgSkOFegAVTWg1u5slyaUBM_ZU";
 
-        Assertions.assertFalse(client.validate(jwt));
+        try {
+            Assertions.assertFalse(client.validate(jwt));
+        } catch (JwtSecretNotFoundException e) {
+            // should not happen
+            Assertions.fail();
+        }
     }
 }

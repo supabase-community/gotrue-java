@@ -3,6 +3,7 @@ package io.supabase;
 import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.ClientUtils;
 import org.springframework.web.client.RestClientResponseException;
@@ -71,7 +72,7 @@ public class GoTrueClient {
      * @return the parsed token.
      * @throws JwtException
      */
-    public ParsedToken parseJwt(String jwt) throws JwtException {
+    public ParsedToken parseJwt(String jwt) throws JwtException, JwtSecretNotFoundException {
         return ClientUtils.parseJwt(jwt);
     }
 
@@ -82,7 +83,7 @@ public class GoTrueClient {
      * @param jwt token to be validated.
      * @return
      */
-    public boolean validate(String jwt) {
+    public boolean validate(String jwt) throws JwtSecretNotFoundException {
         try {
             ClientUtils.parseJwt(jwt);
             // no error -> valid

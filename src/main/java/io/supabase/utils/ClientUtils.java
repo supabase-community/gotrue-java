@@ -3,6 +3,7 @@ package io.supabase.utils;
 import io.jsonwebtoken.*;
 import io.supabase.data.dto.UserMetadataDto;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.JwtSecretNotFoundException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -61,10 +62,10 @@ public class ClientUtils {
         return secret;
     }
 
-    public static ParsedToken parseJwt(String jwt) throws JwtException {
+    public static ParsedToken parseJwt(String jwt) throws JwtException, JwtSecretNotFoundException {
         String secret = getJwtSecret();
         if (secret == null) {
-            throw new RuntimeException("JWT Secret is not defined.");
+            throw new JwtSecretNotFoundException();
         }
         Jws<Claims> claims = parseJwt(jwt, secret);
         ParsedToken parsed = new ParsedToken();
