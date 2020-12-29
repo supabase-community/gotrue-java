@@ -28,3 +28,11 @@ jobs:
         run: cd ./infra && docker-compose up -d
       - name: Run tests with Maven
         run: mvn -B test -D maven.compiler.source=${{ matrix.java }}
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          run: mvn cobertura:cobertura -D maven.compiler.source=${{ matrix.java }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
