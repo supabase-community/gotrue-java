@@ -52,7 +52,7 @@ public class GoTrueClientTest {
 
     @Test
     void constructor_url_headers() {
-        Map<String, String> headers = new HashMap<>() {{
+        Map<String, String> headers = new HashMap<String,String>() {{
             put("SomeHeader", "SomeValue");
             put("Another", "3");
         }};
@@ -61,7 +61,7 @@ public class GoTrueClientTest {
 
     @Test
     void constructor_headers() {
-        Map<String, String> headers = new HashMap<>() {{
+        Map<String, String> headers = new HashMap<String,String>() {{
             put("SomeHeader", "SomeValue");
             put("Another", "3");
         }};
@@ -95,7 +95,7 @@ public class GoTrueClientTest {
     @Test
     void loadProperties_env() {
         try {
-            Utils.setEnv(new HashMap<>() {{
+            Utils.setEnv(new HashMap<String,String>() {{
                 put("GOTRUE_URL", url);
                 put("GOTRUE_HEADERS", "SomeHeader=SomeValue, Another=3");
             }});
@@ -114,7 +114,7 @@ public class GoTrueClientTest {
             Assertions.assertEquals(headers.get("Another"), "3");
 
             // so it doesnt effect the other tests
-            Utils.setEnv(new HashMap<>() {{
+            Utils.setEnv(new HashMap<String,String>() {{
                 put("GOTRUE_URL", null);
                 put("GOTRUE_HEADERS", null);
             }});

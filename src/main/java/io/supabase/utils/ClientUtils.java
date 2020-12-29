@@ -1,8 +1,8 @@
 package io.supabase.utils;
 
 import io.jsonwebtoken.*;
-import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.UserMetadataDto;
+import io.supabase.data.jwt.ParsedToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -67,7 +67,7 @@ public class ClientUtils {
         parsed.setExp(claims.getBody().getExpiration());
         parsed.setSub(claims.getBody().getSubject());
         parsed.setEmail((String) claims.getBody().get("email"));
-        parsed.setAppMetadata((Map) claims.getBody().get("app_metadata"));
+        parsed.setAppMetadata((Map<String, String>) claims.getBody().get("app_metadata"));
         parsed.setUserMetadata((UserMetadataDto) claims.getBody().get("user_metadata"));
         parsed.setRole((String) claims.getBody().get("role"));
         return parsed;

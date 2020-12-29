@@ -6,8 +6,8 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = false)
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class UserUpdatedDto extends UserDto {
     @JsonProperty("new_email")
     String newEmail;
