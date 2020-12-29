@@ -1,8 +1,9 @@
 package io.supabase;
 
 import io.jsonwebtoken.JwtException;
-import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.*;
+import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.ClientUtils;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -15,25 +16,25 @@ public class GoTrueClient {
     private final Map<String, String> headers;
     private AuthenticationDto currentAuth;
 
-    public GoTrueClient(String url, Map<String, String> headers) {
+    protected GoTrueClient(String url, Map<String, String> headers) throws UrlNotFoundException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    public GoTrueClient(Map<String, String> headers) {
+    protected GoTrueClient(Map<String, String> headers) throws UrlNotFoundException {
         this.url = ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    public GoTrueClient(String url) {
+    protected GoTrueClient(String url) throws UrlNotFoundException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    public GoTrueClient() {
+    protected GoTrueClient() throws UrlNotFoundException {
         url = ClientUtils.loadUrl();
         headers = ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
@@ -45,7 +46,7 @@ public class GoTrueClient {
      *
      * @return singleton of GoTrueClient.
      */
-    public static GoTrueClient getInstance() {
+    public static GoTrueClient getInstance() throws UrlNotFoundException {
         if (client == null) {
             client = new GoTrueClient();
         }
@@ -58,7 +59,7 @@ public class GoTrueClient {
      *
      * @return singleton of GoTrueClient.
      */
-    public static GoTrueClient I() {
+    public static GoTrueClient I() throws UrlNotFoundException {
         return getInstance();
     }
 

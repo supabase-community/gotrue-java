@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClientUtils {
+
+    private ClientUtils() {
+    }
+
     public static String loadUrl() {
         String url = System.getenv("GOTRUE_URL");
         if (url == null) {

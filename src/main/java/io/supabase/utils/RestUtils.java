@@ -16,6 +16,10 @@ import java.util.logging.Logger;
 public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+
+    private RestUtils() {
+    }
+
     public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) {
         RestTemplate rest = new RestTemplate();
         try {

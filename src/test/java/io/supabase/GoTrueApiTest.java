@@ -1,6 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
+import io.supabase.exceptions.UrlNotFoundException;
 import org.junit.jupiter.api.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -15,7 +16,12 @@ public class GoTrueApiTest {
 
     @BeforeAll
     static void setup() {
-        api = new GoTrueApi(url, headers);
+        try {
+            api = new GoTrueApi(url, headers);
+        } catch (UrlNotFoundException e) {
+            // should never get here
+            Assertions.fail();
+        }
     }
 
     @BeforeEach

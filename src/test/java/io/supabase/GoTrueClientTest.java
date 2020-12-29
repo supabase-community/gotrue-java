@@ -3,6 +3,7 @@ package io.supabase;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.exceptions.UrlNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,12 @@ public class GoTrueClientTest {
 
     @BeforeEach
     void setup_each() {
-        client = new GoTrueClient(url);
+        try {
+            client = new GoTrueClient(url);
+        } catch (UrlNotFoundException e) {
+            // should never get here
+            Assertions.fail();
+        }
         // to ensure that there is nothing specified
         System.clearProperty("gotrue.url");
         System.clearProperty("gotrue.headers");
@@ -39,12 +45,12 @@ public class GoTrueClientTest {
     @Test
     void loadProperties_no_url() {
         // no env vars nor system properties
-        Assertions.assertThrows(RuntimeException.class, GoTrueClient::new);
+        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::new);
     }
 
     @Test
     void constructor() {
-        Assertions.assertThrows(RuntimeException.class, GoTrueClient::new);
+        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::new);
     }
 
     @Test
@@ -67,7 +73,7 @@ public class GoTrueClientTest {
             put("SomeHeader", "SomeValue");
             put("Another", "3");
         }};
-        Assertions.assertThrows(RuntimeException.class, () -> new GoTrueClient(headers));
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(headers));
     }
 
     @Test
@@ -88,7 +94,7 @@ public class GoTrueClientTest {
             Assertions.assertEquals(headers.get("SomeHeader"), "SomeValue");
             Assertions.assertTrue(headers.containsKey("Another"));
             Assertions.assertEquals(headers.get("Another"), "3");
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | UrlNotFoundException e) {
             e.printStackTrace();
             Assertions.fail();
         }
@@ -128,7 +134,7 @@ public class GoTrueClientTest {
             Assertions.assertEquals(headers.get("SomeHeader"), "SomeValue");
             Assertions.assertTrue(headers.containsKey("Another"));
             Assertions.assertEquals(headers.get("Another"), "3");
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException | NoSuchFieldException | UrlNotFoundException e) {
             Assertions.fail();
         }
     }
@@ -276,7 +282,7 @@ public class GoTrueClientTest {
     @Test
     void getInstance() {
         // no url specified
-        Assertions.assertThrows(RuntimeException.class, GoTrueClient::getInstance);
+        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::getInstance);
     }
 
     @Test
@@ -288,7 +294,7 @@ public class GoTrueClientTest {
     @Test
     void I() {
         // no url specified
-        Assertions.assertThrows(RuntimeException.class, GoTrueClient::I);
+        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::I);
     }
 
     @Test

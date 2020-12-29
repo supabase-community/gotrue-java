@@ -1,6 +1,7 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
+import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.RestUtils;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -11,9 +12,9 @@ public class GoTrueApi {
     protected String url;
     protected Map<String, String> headers;
 
-    public GoTrueApi(String url, Map<String, String> headers) {
+    public GoTrueApi(String url, Map<String, String> headers) throws UrlNotFoundException {
         if (url == null || url.isEmpty()) {
-            throw new RuntimeException("The GoTrue url is not defined");
+            throw new UrlNotFoundException();
         }
         this.url = url;
         this.headers = headers;
