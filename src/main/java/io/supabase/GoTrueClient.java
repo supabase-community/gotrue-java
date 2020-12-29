@@ -5,6 +5,7 @@ import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
+import io.supabase.exceptions.MalformedHeadersException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.utils.ClientUtils;
 
@@ -17,25 +18,25 @@ public class GoTrueClient {
     private final Map<String, String> headers;
     private AuthenticationDto currentAuth;
 
-    protected GoTrueClient(String url, Map<String, String> headers) throws UrlNotFoundException {
+    protected GoTrueClient(String url, Map<String, String> headers) throws UrlNotFoundException, MalformedHeadersException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    protected GoTrueClient(Map<String, String> headers) throws UrlNotFoundException {
+    protected GoTrueClient(Map<String, String> headers) throws UrlNotFoundException, MalformedHeadersException {
         this.url = ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    protected GoTrueClient(String url) throws UrlNotFoundException {
+    protected GoTrueClient(String url) throws UrlNotFoundException, MalformedHeadersException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
     }
 
-    protected GoTrueClient() throws UrlNotFoundException {
+    protected GoTrueClient() throws UrlNotFoundException, MalformedHeadersException {
         url = ClientUtils.loadUrl();
         headers = ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
@@ -47,7 +48,7 @@ public class GoTrueClient {
      *
      * @return singleton of GoTrueClient.
      */
-    public static GoTrueClient getInstance() throws UrlNotFoundException {
+    public static GoTrueClient getInstance() throws UrlNotFoundException, MalformedHeadersException {
         if (client == null) {
             client = new GoTrueClient();
         }
@@ -60,7 +61,7 @@ public class GoTrueClient {
      *
      * @return singleton of GoTrueClient.
      */
-    public static GoTrueClient I() throws UrlNotFoundException {
+    public static GoTrueClient I() throws UrlNotFoundException, MalformedHeadersException {
         return getInstance();
     }
 

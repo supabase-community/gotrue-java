@@ -7,9 +7,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,51 +24,55 @@ public class RestUtils {
     }
 
     public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
+        headers = headers != null ? headers : new HashMap<>();
         RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(body, headers);
 
             return rest.exchange(url, HttpMethod.PUT, entity, responseClass).getBody();
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Put failed", e);
         } catch (JsonProcessingException e) {
             Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
+            return null;
         }
-        return null;
     }
 
     public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
+        headers = headers != null ? headers : new HashMap<>();
         RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(headers);
             ResponseEntity<R> res = rest.exchange(url, HttpMethod.GET, entity, responseClass);
             return res.getBody();
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Get failed", e);
         }
     }
 
     public static void post(Map<String, String> headers, String url) throws ApiException {
+        headers = headers != null ? headers : new HashMap<>();
         RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(headers);
             rest.postForObject(url, entity, Void.class);
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Post failed", e);
         }
     }
 
     public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
+        headers = headers != null ? headers : new HashMap<>();
         RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(body, headers);
             return rest.postForObject(url, entity, responseClass);
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Post failed", e);
         } catch (JsonProcessingException e) {
             Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
+            return null;
         }
-        return null;
     }
 
     private static HttpEntity<String> toEntity(Object object, Map<String, String> headers) throws JsonProcessingException {

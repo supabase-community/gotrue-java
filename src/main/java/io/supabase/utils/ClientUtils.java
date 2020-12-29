@@ -4,9 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.supabase.data.dto.UserMetadataDto;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.JwtSecretNotFoundException;
+import io.supabase.exceptions.MalformedHeadersException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -26,7 +26,7 @@ public class ClientUtils {
         return url;
     }
 
-    public static Map<String, String> loadHeaders() {
+    public static Map<String, String> loadHeaders() throws MalformedHeadersException {
         Map<String, String> res = new HashMap<>();
         String headers = System.getenv("GOTRUE_HEADERS");
 
@@ -34,7 +34,10 @@ public class ClientUtils {
             headers = System.getProperty("gotrue.headers");
         }
         if (headers != null) {
-            String[] arr = headers.split("[\\s,;-]+");
+            if (!headersValid(headers)) {
+                throw new MalformedHeadersException(headers);
+            }
+            String[] arr = headers.split("[\\s,;]+");
             if (arr.length > 0) {
                 String[] s;
                 for (String value : arr) {
@@ -44,6 +47,18 @@ public class ClientUtils {
             }
         }
         return res;
+    }
+
+    private static boolean headersValid(String headers) {
+        String regex = "^"; // beginning of line
+        regex += "(?:"; // start of non-capturing group
+        regex += "[^:=\\s,;]+"; // anything that is not empty(\s) or >,< or >;<
+        regex += "[:=]"; // a : or a =
+        regex += "[^:=\\s,;]+";
+        regex += "[\\s,;]*"; // anything that is empty(\s) or >,< or >;<
+        regex += ")+"; // closing of non-capturing group
+        regex += "$"; // end of line
+        return headers.matches(regex);
     }
 
     private static Jws<Claims> parseJwt(String jwt, String secret) {
@@ -73,8 +88,10 @@ public class ClientUtils {
         parsed.setExp(claims.getBody().getExpiration());
         parsed.setSub(claims.getBody().getSubject());
         parsed.setEmail((String) claims.getBody().get("email"));
-        parsed.setAppMetadata((Map<String, String>) claims.getBody().get("app_metadata"));
-        parsed.setUserMetadata((UserMetadataDto) claims.getBody().get("user_metadata"));
+        Map<String, String> appData = (Map<String, String>) claims.getBody().get("app_metadata");
+        parsed.setAppMetadata(appData != null ? appData : new HashMap<>());
+        Map<String, String> userData = (Map<String, String>) claims.getBody().get("user_metadata");
+        parsed.setUserMetadata(userData != null ? userData : new HashMap<>());
         parsed.setRole((String) claims.getBody().get("role"));
         return parsed;
     }

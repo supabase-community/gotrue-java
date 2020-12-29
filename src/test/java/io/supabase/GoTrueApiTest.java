@@ -4,7 +4,6 @@ import io.supabase.data.dto.*;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.UrlNotFoundException;
 import org.junit.jupiter.api.*;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -37,6 +36,17 @@ class GoTrueApiTest {
         // to ensure that the tests dont affect each other
         RestTemplate rest = new RestTemplate();
         rest.delete("http://localhost:3000/users");
+    }
+
+    @Test
+    void constructor_valid() {
+        Assertions.assertDoesNotThrow(() -> new GoTrueApi(url, headers));
+    }
+
+    @Test
+    void constructor_invalid() {
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueApi(null, null));
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueApi("", null));
     }
 
     @Test

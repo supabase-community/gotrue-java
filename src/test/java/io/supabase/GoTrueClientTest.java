@@ -5,6 +5,7 @@ import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
+import io.supabase.exceptions.MalformedHeadersException;
 import io.supabase.exceptions.UrlNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -27,13 +28,14 @@ class GoTrueClientTest {
     void setup_each() {
         try {
             client = new GoTrueClient(url);
-        } catch (UrlNotFoundException e) {
+        } catch (UrlNotFoundException | MalformedHeadersException e) {
             // should never get here
             Assertions.fail();
         }
         // to ensure that there is nothing specified
         System.clearProperty("gotrue.url");
         System.clearProperty("gotrue.headers");
+        System.clearProperty("gotrue.jwt.secret");
     }
 
     @AfterEach
@@ -57,6 +59,24 @@ class GoTrueClientTest {
     @Test
     void constructor_url() {
         Assertions.assertDoesNotThrow(() -> new GoTrueClient(url));
+    }
+
+    @Test
+    void constructor_url_null() {
+        String u = null;
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(u));
+    }
+
+    @Test
+    void constructor_header_null() {
+        System.setProperty("gotrue.url", url);
+        Map<String, String> m = null;
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(m));
+    }
+
+    @Test
+    void constructor_null_null() {
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(null, null));
     }
 
     @Test
@@ -95,7 +115,7 @@ class GoTrueClientTest {
             Assertions.assertEquals("SomeValue", headers.get("SomeHeader"));
             Assertions.assertTrue(headers.containsKey("Another"));
             Assertions.assertEquals("3", headers.get("Another"));
-        } catch (NoSuchFieldException | IllegalAccessException | UrlNotFoundException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | UrlNotFoundException | MalformedHeadersException e) {
             e.printStackTrace();
             Assertions.fail();
         }
@@ -135,7 +155,7 @@ class GoTrueClientTest {
             Assertions.assertEquals("SomeValue", headers.get("SomeHeader"));
             Assertions.assertTrue(headers.containsKey("Another"));
             Assertions.assertEquals("3", headers.get("Another"));
-        } catch (IllegalAccessException | NoSuchFieldException | UrlNotFoundException e) {
+        } catch (IllegalAccessException | NoSuchFieldException | UrlNotFoundException | MalformedHeadersException e) {
             Assertions.fail();
         }
     }
@@ -222,6 +242,40 @@ class GoTrueClientTest {
     }
 
     @Test
+    void updateUser_null() {
+        try {
+            Assertions.assertNull(client.update(null));
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setEmail("newemail@example.com");
+        try {
+            Assertions.assertNull(client.update(attr));
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void updateUser_null_null() {
+        try {
+            Assertions.assertNull(client.update(null, null));
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setEmail("newemail@example.com");
+        try {
+            Assertions.assertNull(client.update(null, attr));
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     void updateUser_email_jwt_given() {
         // create a user
         AuthenticationDto r = null;
@@ -255,6 +309,14 @@ class GoTrueClientTest {
 
         Assertions.assertDoesNotThrow(() -> client.signOut());
     }
+
+    @Test
+    void signOut_null() {
+        // not logged in
+        Assertions.assertDoesNotThrow(() -> client.signOut());
+        Assertions.assertDoesNotThrow(() -> client.signOut(null));
+    }
+
 
     @Test
     void signOut_jwt() {
@@ -413,6 +475,17 @@ class GoTrueClientTest {
             Assertions.fail();
         }
         Utils.assertParsedToken(parsedToken);
+    }
+
+    @Test
+    void parseJwt_no_secret() {
+        try {
+            // create a user
+            AuthenticationDto r = client.signUp("email@example.com", "secret");
+            Assertions.assertThrows(JwtSecretNotFoundException.class, () -> client.parseJwt(r.getAccessToken()));
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
     }
 
     @Test

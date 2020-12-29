@@ -16,7 +16,6 @@ class Utils {
         Assertions.assertNotNull(dto.getRefreshToken());
         Assertions.assertNotNull(dto.getTokenType());
         Assertions.assertNotNull(dto.getUser());
-        Assertions.assertNotNull(dto.getUser().getId());
         assertUserDto(dto.getUser());
     }
 
@@ -50,6 +49,10 @@ class Utils {
         Assertions.assertNotNull(t);
         Assertions.assertNotNull(t.getExp());
         Assertions.assertNotNull(t.getSub());
+        Assertions.assertNotNull(t.getEmail());
+        Assertions.assertNotNull(t.getAppMetadata());
+        Assertions.assertNotNull(t.getUserMetadata());
+        Assertions.assertNotNull(t.getRole());
     }
 
 

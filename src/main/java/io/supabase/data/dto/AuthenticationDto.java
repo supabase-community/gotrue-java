@@ -1,9 +1,9 @@
 package io.supabase.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class AuthenticationDto {
     @JsonProperty("access_token")
     String accessToken;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -21,9 +22,9 @@ public class UserDto {
     @JsonProperty("last_sign_in_at")
     Date lastSignInAt;
     @JsonProperty("app_metadata")
-    AppMetadataDto appMetadata;
+    Map<String, String> appMetadata;
     @JsonProperty("user_metadata")
-    UserMetadataDto userMetadata;
+    Map<String, String> userMetadata;
     @JsonProperty("created_at")
     Date createdAt;
     @JsonProperty("updated_at")

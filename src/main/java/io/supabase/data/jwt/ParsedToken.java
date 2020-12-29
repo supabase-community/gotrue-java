@@ -1,7 +1,6 @@
 package io.supabase.data.jwt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.supabase.data.dto.UserMetadataDto;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,7 +17,7 @@ public class ParsedToken {
     @JsonProperty("app_metadata")
     Map<String, String> appMetadata;
     @JsonProperty("user_metadata")
-    UserMetadataDto userMetadata;
+    Map<String, String> userMetadata;
     @JsonProperty("role")
     String role;
 }
