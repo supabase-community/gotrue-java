@@ -2,7 +2,7 @@
 
 A Java client library for the [GoTrue](https://github.com/netlify/gotrue) API.
 
-# Instalation
+# Installation
 
 WIP
 

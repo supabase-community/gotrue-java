@@ -12,7 +12,7 @@ public class GoTrueApi {
     protected String url;
     protected Map<String, String> headers;
 
-    public GoTrueApi(String url, Map<String, String> headers) throws UrlNotFoundException {
+    protected GoTrueApi(String url, Map<String, String> headers) throws UrlNotFoundException {
         if (url == null || url.isEmpty()) {
             throw new UrlNotFoundException();
         }
@@ -24,6 +24,7 @@ public class GoTrueApi {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
+     * @throws ApiException
      */
     public SettingsDto getSettings() throws ApiException {
         String urlSettings = String.format("%s/settings", url);
@@ -47,6 +48,7 @@ public class GoTrueApi {
      * @param jwt           A valid JWT.
      * @param attributesDto The data you want to update
      * @return details of the updated user.
+     * @throws ApiException
      */
     public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws ApiException {
         String urlUser = String.format("%s/user", url);
@@ -59,6 +61,7 @@ public class GoTrueApi {
      *
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
+     * @throws ApiException
      */
     public AuthenticationDto refreshAccessToken(String refreshToken) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=refresh_token", url);
@@ -73,6 +76,7 @@ public class GoTrueApi {
      *
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
+     * @throws ApiException
      */
     public UserDto getUser(String jwt) throws ApiException {
         String urlUser = String.format("%s/user", url);
@@ -84,6 +88,7 @@ public class GoTrueApi {
      * Removes a logged-in session.
      *
      * @param jwt A valid, logged-in JWT.
+     * @throws ApiException
      */
     public void signOut(String jwt) throws ApiException {
         String urlLogout = String.format("%s/logout", url);
@@ -96,6 +101,7 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
+     * @throws ApiException
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
@@ -109,6 +115,7 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
+     * @throws ApiException
      */
     public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=password", url);
@@ -122,6 +129,7 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
+     * @throws ApiException
      */
     public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
@@ -135,6 +143,7 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
+     * @throws ApiException
      */
     public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
         String urlSignup = String.format("%s/signup", url);
