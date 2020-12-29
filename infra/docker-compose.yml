@@ -5,7 +5,7 @@ services:
     ports:
       - '9999:9999'
     environment:
-      GOTRUE_JWT_SECRET: super-secret-jwt-token
+      GOTRUE_JWT_SECRET: superSecretJwtToken
       GOTRUE_JWT_EXP: 3600
       GOTRUE_DB_DRIVER: postgres
       DB_NAMESPACE: auth

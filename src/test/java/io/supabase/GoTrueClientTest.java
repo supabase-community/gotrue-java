@@ -1,5 +1,7 @@
 package io.supabase;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -260,5 +262,65 @@ public class GoTrueClientTest {
         AuthenticationDto r = client.signUp("email@example.com", "secret");
         UserDto user = client.getCurrentUser();
         Assertions.assertEquals(r.getUser(), user);
+    }
+
+    @Test
+    void getInstance() {
+        // no url specified
+        Assertions.assertThrows(RuntimeException.class, GoTrueClient::getInstance);
+    }
+
+    @Test
+    void getInstance_url() {
+        System.setProperty("gotrue.url", url);
+        Assertions.assertDoesNotThrow(GoTrueClient::getInstance);
+    }
+
+    @Test
+    void I() {
+        // no url specified
+        Assertions.assertThrows(RuntimeException.class, GoTrueClient::I);
+    }
+
+    @Test
+    void I_url() {
+        System.setProperty("gotrue.url", url);
+        Assertions.assertDoesNotThrow(GoTrueClient::I);
+    }
+
+    @Test
+    void parseJwt() {
+        System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
+        // create a user
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+        ParsedToken parsedToken = client.parseJwt(r.getAccessToken());
+        Utils.assertParsedToken(parsedToken);
+    }
+
+    @Test
+    void parseJwt_expired() {
+        System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
+        // some old token
+        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MDkyMDI4ODMsInN1YiI6ImE5NDJiM2QxLTNhNTItNDQ1Ny04YzRmLTg4ZDA3YzJkYmUzMCIsImVtYWlsIjoiZW1haWxAZXhhbXBsZS5jb20iLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCJ9LCJ1c2VyX21ldGFkYXRhIjpudWxsLCJyb2xlIjoiIn0.-DVqBKAqUkcj59rXWqgSkOFegAVTWg1u5slyaUBM_ZU";
+
+        Assertions.assertThrows(ExpiredJwtException.class, () -> client.parseJwt(jwt));
+    }
+
+    @Test
+    void validate() {
+        System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
+        // create a user
+        AuthenticationDto r = client.signUp("email@example.com", "secret");
+
+        Assertions.assertTrue(client.validate(r.getAccessToken()));
+    }
+
+    @Test
+    void validate_expired() {
+        System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
+        // some old token
+        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MDkyMDI4ODMsInN1YiI6ImE5NDJiM2QxLTNhNTItNDQ1Ny04YzRmLTg4ZDA3YzJkYmUzMCIsImVtYWlsIjoiZW1haWxAZXhhbXBsZS5jb20iLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCJ9LCJ1c2VyX21ldGFkYXRhIjpudWxsLCJyb2xlIjoiIn0.-DVqBKAqUkcj59rXWqgSkOFegAVTWg1u5slyaUBM_ZU";
+
+        Assertions.assertFalse(client.validate(jwt));
     }
 }

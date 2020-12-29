@@ -1,5 +1,7 @@
 package io.supabase;
 
+import io.jsonwebtoken.JwtException;
+import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.*;
 import io.supabase.utils.ClientUtils;
 import org.springframework.web.client.RestClientResponseException;
@@ -7,6 +9,7 @@ import org.springframework.web.client.RestClientResponseException;
 import java.util.Map;
 
 public class GoTrueClient {
+    private static GoTrueClient client;
     private final GoTrueApi api;
     private final String url;
     private final Map<String, String> headers;
@@ -34,6 +37,58 @@ public class GoTrueClient {
         url = ClientUtils.loadUrl();
         headers = ClientUtils.loadHeaders();
         api = new GoTrueApi(url, headers);
+    }
+
+
+    /**
+     * Get a GoTrueClient singleton.
+     *
+     * @return singleton of GoTrueClient.
+     */
+    public static GoTrueClient getInstance() {
+        if (client == null) {
+            client = new GoTrueClient();
+        }
+        return client;
+    }
+
+    /**
+     * Get a GoTrueClient singleton.
+     * Shorthand for getInstance.
+     *
+     * @return singleton of GoTrueClient.
+     */
+    public static GoTrueClient I() {
+        return getInstance();
+    }
+
+
+    /**
+     * Parses a jwt token.
+     *
+     * @param jwt token to be parsed.
+     * @return the parsed token.
+     * @throws JwtException
+     */
+    public ParsedToken parseJwt(String jwt) throws JwtException {
+        return ClientUtils.parseJwt(jwt);
+    }
+
+
+    /**
+     * Checks whether a jwt is valid.
+     *
+     * @param jwt token to be validated.
+     * @return
+     */
+    public boolean validate(String jwt) {
+        try {
+            ClientUtils.parseJwt(jwt);
+            // no error -> valid
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
 
