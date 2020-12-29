@@ -52,7 +52,7 @@ gotrue.jwt.secret=superSecretJwtToken
 
 # Documentation
 
-- [JavaDoc](docs/index.html)
+- [JavaDoc](https://ffabss.github.io/gotrue-java/)
 
 # Development
 
