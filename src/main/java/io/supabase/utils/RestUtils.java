@@ -18,17 +18,15 @@ import java.util.logging.Logger;
 
 public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final RestTemplate rest = new RestTemplate();
 
 
     private RestUtils() {
     }
 
     public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
-        headers = headers != null ? headers : new HashMap<>();
-        RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(body, headers);
-
             return rest.exchange(url, HttpMethod.PUT, entity, responseClass).getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Put failed", e);
@@ -39,8 +37,6 @@ public class RestUtils {
     }
 
     public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
-        headers = headers != null ? headers : new HashMap<>();
-        RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(headers);
             ResponseEntity<R> res = rest.exchange(url, HttpMethod.GET, entity, responseClass);
@@ -51,8 +47,6 @@ public class RestUtils {
     }
 
     public static void post(Map<String, String> headers, String url) throws ApiException {
-        headers = headers != null ? headers : new HashMap<>();
-        RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(headers);
             rest.postForObject(url, entity, Void.class);
@@ -62,8 +56,6 @@ public class RestUtils {
     }
 
     public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
-        headers = headers != null ? headers : new HashMap<>();
-        RestTemplate rest = new RestTemplate();
         try {
             HttpEntity<String> entity = toEntity(body, headers);
             return rest.postForObject(url, entity, responseClass);
@@ -85,6 +77,7 @@ public class RestUtils {
 
     private static HttpEntity<String> toEntity(String jsonBody, Map<String, String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
+        headers = (headers != null) ? headers : new HashMap<>();
         headers.forEach(httpHeaders::add);
         return new HttpEntity<>(jsonBody, httpHeaders);
     }

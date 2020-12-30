@@ -38,12 +38,10 @@ public class ClientUtils {
                 throw new MalformedHeadersException(headers);
             }
             String[] arr = headers.split("[\\s,;]+");
-            if (arr.length > 0) {
-                String[] s;
-                for (String value : arr) {
-                    s = value.split("[=:]+");
-                    res.put(s[0], s[1]);
-                }
+            String[] s;
+            for (String value : arr) {
+                s = value.split("[=:]+");
+                res.put(s[0], s[1]);
             }
         }
         return res;

@@ -481,6 +481,33 @@ class GoTrueClientTest {
     }
 
     @Test
+    void parseJwt_metadata_provided() {
+        // provide secret
+        System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
+        AuthenticationDto r = null;
+        UserAttributesDto attr = new UserAttributesDto();
+        attr.setData(new HashMap<String, Object>() {{
+            put("name", "UserName");
+            put("age", 33);
+        }});
+        try {
+            client.signUp("email@example.com", "secret");
+            client.update(attr);
+            r = client.signIn("email@example.com", "secret");
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
+
+        ParsedToken parsedToken = null;
+        try {
+            parsedToken = client.parseJwt(r.getAccessToken());
+        } catch (JwtSecretNotFoundException e) {
+            Assertions.fail();
+        }
+        Utils.assertParsedToken(parsedToken);
+    }
+
+    @Test
     void parseJwt_no_secret() {
         try {
             // create a user

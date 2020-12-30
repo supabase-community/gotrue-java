@@ -57,6 +57,4 @@ class Utils {
         Assertions.assertNotNull(t.getUserMetadata());
         Assertions.assertNotNull(t.getRole());
     }
-
-
 }
