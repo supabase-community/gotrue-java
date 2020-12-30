@@ -238,6 +238,7 @@ class GoTrueClientTest {
         }
 
         Utils.assertUserUpdatedDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
 
@@ -295,6 +296,7 @@ class GoTrueClientTest {
             Assertions.fail();
         }
         Utils.assertUserUpdatedDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
 
@@ -411,6 +413,7 @@ class GoTrueClientTest {
             Assertions.fail();
         }
         Utils.assertUserDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test

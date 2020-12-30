@@ -164,6 +164,7 @@ class GoTrueApiTest {
             Assertions.fail();
         }
         Utils.assertUserDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test
@@ -214,6 +215,7 @@ class GoTrueApiTest {
         }
         Utils.assertUserUpdatedDto(user);
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
+        Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test
@@ -232,6 +234,7 @@ class GoTrueApiTest {
         }
         // normal assert because there is no new email attribute
         Utils.assertUserDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test

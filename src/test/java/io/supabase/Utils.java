@@ -17,6 +17,7 @@ class Utils {
         Assertions.assertNotNull(dto.getTokenType());
         Assertions.assertNotNull(dto.getUser());
         assertUserDto(dto.getUser());
+        // no check for userMetadata as it tends to be null here
     }
 
     protected static void assertUserUpdatedDto(UserUpdatedDto user) {
@@ -36,12 +37,14 @@ class Utils {
         Assertions.assertNotNull(user.getConfirmedAt());
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getUpdatedAt());
+        Assertions.assertNotNull(user.getAppMetadata());
     }
 
     protected static void assertSettingsDto(SettingsDto s) {
         Assertions.assertNotNull(s);
         Assertions.assertNotNull(s.getAutoconfirm());
         Assertions.assertNotNull(s.getExternal());
+        Assertions.assertNotNull(s.getExternalLabels());
         Assertions.assertNotNull(s.getDisableSignup());
     }
 
