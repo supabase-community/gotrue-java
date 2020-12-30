@@ -1,13 +1,15 @@
 package io.supabase.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 public class UserDto {
     @JsonProperty("id")
     UUID id;

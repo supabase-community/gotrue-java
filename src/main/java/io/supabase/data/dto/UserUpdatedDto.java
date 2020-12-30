@@ -1,11 +1,13 @@
 package io.supabase.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 public class UserUpdatedDto extends UserDto {
     @JsonProperty("new_email")
     String newEmail;
