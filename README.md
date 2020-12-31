@@ -22,6 +22,8 @@ Default headers that are included with every request to the API.
 
 ```environment
 GOTRUE_HEADERS=MyHeader=MyValue, Header2=Val
+// or
+GOTRUE_HEADERS=MyHeader:MyValue, Header2:Val
 ```
 
 The GoTrue JWT secret to validate jwt Tokens.
@@ -41,6 +43,8 @@ gotrue.url=https://...
 Default headers that are included with every request to the API.
 
 ```properties
+gotrue.headers=MyHeader:MyValue, Header2:Val
+// or
 gotrue.headers=MyHeader=MyValue, Header2=Val
 ```
 
@@ -53,6 +57,12 @@ gotrue.jwt.secret=superSecretJwtToken
 # Documentation
 
 - [JavaDoc](https://ffabss.github.io/gotrue-java/)
+
+# Roadmap
+
+- [ ] support OAuth
+- [ ] deploy to maven
+- [ ] deploy to gradle?
 
 # Development
 
