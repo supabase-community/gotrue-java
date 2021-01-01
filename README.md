@@ -1,6 +1,6 @@
-# `gotrue-java WIP` ![Java CI with Maven](https://github.com/ffabss/gotrue-java/workflows/Java%20CI%20with%20Maven/badge.svg) [![codecov](https://codecov.io/gh/ffabss/gotrue-java/branch/master/graph/badge.svg?token=V2T6WRH9CB)](https://codecov.io/gh/ffabss/gotrue-java)
+# `gotrue-java WIP` ![Java CI with Maven](https://github.com/supabase/gotrue-java/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master) [![codecov](https://codecov.io/gh/supabase/gotrue-java/branch/master/graph/badge.svg?token=V2T6WRH9CB)](https://codecov.io/gh/supabase/gotrue-java)
 
-A Java client library for the [GoTrue](https://github.com/netlify/gotrue) API.
+A Java client library for the [GoTrue](https://github.com/supabase/gotrue) API.
 
 # Installation
 
@@ -56,7 +56,7 @@ gotrue.jwt.secret=superSecretJwtToken
 
 # Documentation
 
-- [JavaDoc](https://ffabss.github.io/gotrue-java/)
+- [JavaDoc](https://supabase.github.io/gotrue-java/)
 
 # Roadmap
 
