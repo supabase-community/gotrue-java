@@ -92,6 +92,7 @@ public class ClientUtils {
         return secret;
     }
 
+    @SuppressWarnings("unchecked")
     public static ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
         String secret = getJwtSecret();
         if (secret == null) {

@@ -41,7 +41,7 @@ public class ClientUtilsTest {
         System.setProperty("gotrue.headers", "");
         Assertions.assertThrows(MalformedHeadersException.class, ClientUtils::loadHeaders);
 
-        System.setProperty("gotrue.headers", ":asdfasdf,asdf");
+        System.setProperty("gotrue.headers", ":invalid,word");
         Assertions.assertThrows(MalformedHeadersException.class, ClientUtils::loadHeaders);
     }
 
@@ -57,7 +57,7 @@ public class ClientUtilsTest {
 
     @Test
     void parseJwt_no_secret() {
-        Assertions.assertThrows(JwtSecretNotFoundException.class, () -> ClientUtils.parseJwt("asdf"));
+        Assertions.assertThrows(JwtSecretNotFoundException.class, () -> ClientUtils.parseJwt("invalid"));
     }
 
     @Test

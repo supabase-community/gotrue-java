@@ -63,15 +63,13 @@ class GoTrueClientTest {
 
     @Test
     void constructor_url_null() {
-        String u = null;
-        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(u));
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient((String) null));
     }
 
     @Test
     void constructor_header_null() {
         System.setProperty("gotrue.url", url);
-        Map<String, String> m = null;
-        Assertions.assertDoesNotThrow(() -> new GoTrueClient(m));
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient((Map<String, String>) null));
     }
 
     @Test
@@ -98,6 +96,7 @@ class GoTrueClientTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void loadProperties() {
         System.setProperty("gotrue.url", url);
         Assertions.assertDoesNotThrow((ThrowingSupplier<GoTrueClient>) GoTrueClient::new);
@@ -138,6 +137,7 @@ class GoTrueClientTest {
         Assertions.assertDoesNotThrow((ThrowingSupplier<GoTrueClient>) GoTrueClient::new);
     }
 
+    @SuppressWarnings("unchecked")
     void constructorWithEnv_headers() {
         try {
             // set url so it doesnt throw
@@ -172,14 +172,14 @@ class GoTrueClientTest {
     }
 
     @Test
-    void signUpWithEmail_creds() {
-        CredentialsDto creds = new CredentialsDto();
-        creds.setEmail("email@example.com");
-        creds.setPassword("secret");
+    void signUpWithEmail_credentials() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setEmail("email@example.com");
+        credentials.setPassword("secret");
 
         AuthenticationDto r = null;
         try {
-            r = client.signUp(creds);
+            r = client.signUp(credentials);
         } catch (ApiException e) {
             Assertions.fail();
         }
@@ -201,17 +201,17 @@ class GoTrueClientTest {
     }
 
     @Test
-    void signInWithEmail_creds() {
-        CredentialsDto creds = new CredentialsDto();
-        creds.setEmail("email@example.com");
-        creds.setPassword("secret");
+    void signInWithEmail_credentials() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setEmail("email@example.com");
+        credentials.setPassword("secret");
 
         AuthenticationDto r = null;
         try {
             // create a user
-            client.signUp(creds);
+            client.signUp(credentials);
             // login with said user
-            r = client.signIn(creds);
+            r = client.signIn(credentials);
         } catch (ApiException e) {
             Assertions.fail();
         }

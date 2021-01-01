@@ -61,14 +61,14 @@ class GoTrueApiTest {
     }
 
     @Test
-    void signUpWithEmail_creds() {
-        CredentialsDto creds = new CredentialsDto();
-        creds.setEmail("email@example.com");
-        creds.setPassword("secret");
+    void signUpWithEmail_credentials() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setEmail("email@example.com");
+        credentials.setPassword("secret");
 
         AuthenticationDto r = null;
         try {
-            r = api.signUpWithEmail(creds);
+            r = api.signUpWithEmail(credentials);
         } catch (ApiException e) {
             Assertions.fail();
         }
@@ -101,17 +101,17 @@ class GoTrueApiTest {
     }
 
     @Test
-    void signInWithEmail_creds() {
+    void signInWithEmail_credentials() {
         AuthenticationDto r = null;
         try {
             // create a user
             api.signUpWithEmail("email@example.com", "secret");
 
             // login with said user
-            CredentialsDto creds = new CredentialsDto();
-            creds.setEmail("email@example.com");
-            creds.setPassword("secret");
-            r = api.signInWithEmail(creds);
+            CredentialsDto credentials = new CredentialsDto();
+            credentials.setEmail("email@example.com");
+            credentials.setPassword("secret");
+            r = api.signInWithEmail(credentials);
         } catch (ApiException e) {
             Assertions.fail();
         }
