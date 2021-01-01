@@ -20,6 +20,20 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+    /**
+     * Send an magic-link to a given email.
+     *
+     * @param email the email the link should be sent to.
+     * @throws ApiException
+     */
+    public void magicLink(String email) throws ApiException {
+        String urlMagicLink = String.format("%s/magiclink", url);
+
+        EmailDto emailDto = new EmailDto();
+        emailDto.setEmail(email);
+
+        RestUtils.post(emailDto, headers, urlMagicLink);
+    }
 
     /**
      * Send a password-recovery link to a given email.

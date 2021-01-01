@@ -257,4 +257,14 @@ public class GoTrueClient {
     public void recover(String email) throws ApiException {
         api.recoverPassword(email);
     }
+
+    /**
+     * Send an magic-link to a given email.
+     *
+     * @param email the email the link should be sent to.
+     * @throws ApiException
+     */
+    public void magicLink(String email) throws ApiException {
+        api.magicLink(email);
+    }
 }

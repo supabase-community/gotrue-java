@@ -586,4 +586,24 @@ class GoTrueClientTest {
             Assertions.assertTrue(e.getCause().getMessage().startsWith("404 Not Found"));
         }
     }
+
+    @Test
+    void magicLink() {
+        AuthenticationDto r = null;
+        try {
+            // create a user
+            r = client.signUp("email@example.com", "secret");
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
+        final AuthenticationDto finalR = r;
+        // send recovery link to user
+        Assertions.assertDoesNotThrow(() -> client.magicLink(finalR.getUser().getEmail()));
+    }
+
+    @Test
+    void magicLink_no_user() {
+        // there does not already have to be an user registered with the email
+        Assertions.assertDoesNotThrow(() -> client.magicLink("email@example.com"));
+    }
 }
