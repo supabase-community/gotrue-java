@@ -247,4 +247,14 @@ public class GoTrueClient {
     public AuthenticationDto refresh(String refreshToken) throws ApiException {
         return api.refreshAccessToken(refreshToken);
     }
+
+    /**
+     * Send a password-recovery link to a given email.
+     *
+     * @param email the email a recovery link should be sent to.
+     * @throws ApiException
+     */
+    public void recover(String email) throws ApiException {
+        api.recoverPassword(email);
+    }
 }

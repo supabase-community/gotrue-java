@@ -560,4 +560,30 @@ class GoTrueClientTest {
             Assertions.fail();
         }
     }
+
+    @Test
+    void recoverPassword() {
+        AuthenticationDto r = null;
+        try {
+            // create a user
+            r = client.signUp("email@example.com", "secret");
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
+        final AuthenticationDto finalR = r;
+        // send recovery link to user
+        Assertions.assertDoesNotThrow(() -> client.recover(finalR.getUser().getEmail()));
+    }
+
+    @Test
+    void recoverPassword_no_user() {
+        try {
+            client.recover("email@example.com");
+            // should throw an exception
+            Assertions.fail();
+        } catch (ApiException e) {
+            // there is no user with the given email
+            Assertions.assertTrue(e.getCause().getMessage().startsWith("404 Not Found"));
+        }
+    }
 }

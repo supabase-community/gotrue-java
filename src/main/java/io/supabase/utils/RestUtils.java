@@ -55,6 +55,10 @@ public class RestUtils {
         }
     }
 
+    public static void post(Object body, Map<String, String> headers, String url) throws ApiException {
+        post(body, Void.class, headers, url);
+    }
+
     public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(body, headers);

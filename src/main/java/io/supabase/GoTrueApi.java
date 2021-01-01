@@ -20,6 +20,22 @@ public class GoTrueApi {
         this.headers = headers;
     }
 
+
+    /**
+     * Send a password-recovery link to a given email.
+     *
+     * @param email the email a recovery link should be sent to.
+     * @throws ApiException
+     */
+    public void recoverPassword(String email) throws ApiException {
+        String urlRecover = String.format("%s/recover", url);
+
+        EmailDto emailDto = new EmailDto();
+        emailDto.setEmail(email);
+
+        RestUtils.post(emailDto, headers, urlRecover);
+    }
+
     /**
      * Get the settings from the gotrue server.
      *
