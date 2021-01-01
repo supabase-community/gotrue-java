@@ -24,6 +24,18 @@ public class RestUtils {
     private RestUtils() {
     }
 
+
+    /**
+     * Sends a Put request.
+     *
+     * @param body          the body of the request, will be parsed to json.
+     * @param responseClass the class of the response.
+     * @param headers       the headers that will be sent with the request.
+     * @param url           the url the request will be sent to.
+     * @param <R>           the type of the response.
+     * @return the response of the request parsed from json to R.
+     * @throws ApiException
+     */
     public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(body, headers);
@@ -36,6 +48,16 @@ public class RestUtils {
         }
     }
 
+    /**
+     * Sends a Get request.
+     *
+     * @param responseClass the class of the response.
+     * @param headers       the headers that will be sent with the request.
+     * @param url           the url the request will be sent to.
+     * @param <R>           the type of the response.
+     * @return the response of the request parsed from json to R.
+     * @throws ApiException
+     */
     public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(headers);
@@ -46,6 +68,14 @@ public class RestUtils {
         }
     }
 
+
+    /**
+     * Sends a Post request.
+     *
+     * @param headers the headers that will be sent with the request.
+     * @param url     the url the request will be sent to.
+     * @throws ApiException
+     */
     public static void post(Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(headers);
@@ -55,10 +85,29 @@ public class RestUtils {
         }
     }
 
+    /**
+     * Sends a Post request.
+     *
+     * @param body    the body of the request, will be parsed to json.
+     * @param headers the headers that will be sent with the request.
+     * @param url     the url the request will be sent to.
+     * @throws ApiException
+     */
     public static void post(Object body, Map<String, String> headers, String url) throws ApiException {
         post(body, Void.class, headers, url);
     }
 
+    /**
+     * Sends a Post request.
+     *
+     * @param body          the body of the request, will be parsed to json.
+     * @param responseClass the class of the response.
+     * @param headers       the headers that will be sent with the request.
+     * @param url           the url the request will be sent to.
+     * @param <R>           the type of the response.
+     * @return the response of the request parsed from json to R.
+     * @throws ApiException
+     */
     public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(body, headers);

@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.MalformedHeadersException;
+import io.supabase.exceptions.UrlNotFoundException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -18,14 +19,29 @@ public class ClientUtils {
     private ClientUtils() {
     }
 
-    public static String loadUrl() {
+    /**
+     * Gets the GoTrue Url if specified.
+     *
+     * @return the specified GoTrue Url either from the environment or from the properties
+     * @throws UrlNotFoundException if the Url is not specified.
+     */
+    public static String loadUrl() throws UrlNotFoundException {
         String url = System.getenv("GOTRUE_URL");
         if (url == null) {
             url = System.getProperty("gotrue.url");
         }
+        if (url == null) {
+            throw new UrlNotFoundException();
+        }
         return url;
     }
 
+    /**
+     * Gets the default headers if specified.
+     *
+     * @return a map with the specified headers or an empty one if no headers are specified.
+     * @throws MalformedHeadersException if the specified headers are not valid.
+     */
     public static Map<String, String> loadHeaders() throws MalformedHeadersException {
         Map<String, String> res = new HashMap<>();
         String headers = System.getenv("GOTRUE_HEADERS");
