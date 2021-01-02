@@ -3,6 +3,7 @@ package io.supabase;
 import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.data.resources.Credentials;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.MalformedHeadersException;
@@ -110,6 +111,35 @@ public class GoTrueClient {
     }
 
     /**
+     * Logs in an existing user using either their email address or an OAuth provider.
+     *
+     * @param email    The email address of the user.
+     * @param password The password of the user.
+     * @param provider The provider of the user.
+     * @return Details about the authentication.
+     * @throws ApiException
+     */
+    public AuthenticationDto signIn(String email, String password, String provider) throws ApiException {
+        if (email != null && !email.isEmpty()) {
+            if (password != null && !password.isEmpty()) {
+                currentAuth = api.signInWithEmail(email, password);
+            } else {
+                api.magicLink(email);
+                return null;
+            }
+        } else if (provider != null && !provider.isEmpty()) {
+            String urlProvider = api.getUrlForProvider(provider);
+            if (!ClientUtils.openUrl(urlProvider)) {
+                throw new ApiException(String.format("failed to open the Provider url: %s", urlProvider));
+            }
+            return null;
+        } else {
+            throw new IllegalArgumentException("At least one of the parameters is required!");
+        }
+        return currentAuth;
+    }
+
+    /**
      * Logs in an existing user using their email address.
      *
      * @param email    The email address of the user.
@@ -118,20 +148,31 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public AuthenticationDto signIn(String email, String password) throws ApiException {
-        currentAuth = api.signInWithEmail(email, password);
-        return currentAuth;
+        return signIn(email, password, null);
+    }
+
+
+    /**
+     * Logs in an existing user using their email address to send a magic-link.
+     *
+     * @param email The email address of the user.
+     * @return Details about the authentication.
+     * @throws ApiException
+     */
+    public AuthenticationDto signIn(String email) throws ApiException {
+        return signIn(email, null, null);
     }
 
     /**
      * Logs in an existing user using their email address.
      *
-     * @param credentials Object with the email and the password of the user.
+     * @param credentials Object with the email and/or the password or the provider of the user.
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
-        currentAuth = api.signInWithEmail(credentials);
-        return currentAuth;
+    public AuthenticationDto signIn(Credentials credentials) throws ApiException {
+        if (credentials == null) throw new IllegalArgumentException("Cannot be null!");
+        return signIn(credentials.getEmail(), credentials.getPassword(), credentials.getProvider());
     }
 
     /**
@@ -154,7 +195,7 @@ public class GoTrueClient {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signUp(EmailCredentialsDto credentials) throws ApiException {
         currentAuth = api.signUpWithEmail(credentials);
         return currentAuth;
     }
@@ -256,15 +297,5 @@ public class GoTrueClient {
      */
     public void recover(String email) throws ApiException {
         api.recoverPassword(email);
-    }
-
-    /**
-     * Send an magic-link to a given email.
-     *
-     * @param email the email the link should be sent to.
-     * @throws ApiException
-     */
-    public void magicLink(String email) throws ApiException {
-        api.magicLink(email);
     }
 }

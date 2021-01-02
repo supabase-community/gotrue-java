@@ -3,6 +3,7 @@ package io.supabase;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.data.resources.Credentials;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.MalformedHeadersException;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;
 import org.springframework.web.client.RestTemplate;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -173,7 +175,7 @@ class GoTrueClientTest {
 
     @Test
     void signUpWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
+        EmailCredentialsDto credentials = new EmailCredentialsDto();
         credentials.setEmail("email@example.com");
         credentials.setPassword("secret");
 
@@ -193,7 +195,7 @@ class GoTrueClientTest {
             // create a user
             client.signUp("email@example.com", "secret");
             // login with said user
-            r = client.signIn("email@example.com", "secret");
+            r = client.signIn("email@example.com", "secret", null);
         } catch (ApiException e) {
             Assertions.fail();
         }
@@ -202,7 +204,7 @@ class GoTrueClientTest {
 
     @Test
     void signInWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
+        EmailCredentialsDto credentials = new EmailCredentialsDto();
         credentials.setEmail("email@example.com");
         credentials.setPassword("secret");
 
@@ -211,7 +213,7 @@ class GoTrueClientTest {
             // create a user
             client.signUp(credentials);
             // login with said user
-            r = client.signIn(credentials);
+            r = client.signIn(credentials.getEmail(), credentials.getPassword());
         } catch (ApiException e) {
             Assertions.fail();
         }
@@ -588,7 +590,7 @@ class GoTrueClientTest {
     }
 
     @Test
-    void magicLink() {
+    void signIn_magicLink() {
         AuthenticationDto r = null;
         try {
             // create a user
@@ -598,12 +600,31 @@ class GoTrueClientTest {
         }
         final AuthenticationDto finalR = r;
         // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> client.magicLink(finalR.getUser().getEmail()));
+        Assertions.assertDoesNotThrow(() -> client.signIn(finalR.getUser().getEmail()));
     }
 
     @Test
-    void magicLink_no_user() {
+    void signIn_magicLink_no_user() {
         // there does not already have to be an user registered with the email
-        Assertions.assertDoesNotThrow(() -> client.magicLink("email@example.com"));
+        Assertions.assertDoesNotThrow(() -> client.signIn("email@example.com"));
+    }
+
+    @Test
+    void signIn_provider() {
+        Credentials credentials = new Credentials();
+        credentials.setProvider("google");
+        // opens browser if possible otherwise throw ApiException
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            Assertions.assertDoesNotThrow(() -> client.signIn(credentials));
+        } else {
+            Assertions.assertThrows(ApiException.class, () -> client.signIn(credentials));
+        }
+    }
+
+    @Test
+    void signIn_no_params() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn((Credentials) null));
     }
 }

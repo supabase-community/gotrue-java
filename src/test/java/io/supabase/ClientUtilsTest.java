@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -92,6 +93,18 @@ public class ClientUtilsTest {
             Assertions.assertEquals("superSecretJwtToken", m.invoke(null));
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             Assertions.fail();
+        }
+    }
+
+    @Test
+    void openUrl() {
+        String someUrl = "https://duck.com/";
+        // opens browser if possible
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            Assertions.assertTrue(ClientUtils.openUrl(someUrl));
+        } else {
+            Assertions.assertFalse(ClientUtils.openUrl(someUrl));
         }
     }
 }

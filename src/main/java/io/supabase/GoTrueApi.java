@@ -134,7 +134,7 @@ public class GoTrueApi {
      * @throws ApiException
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
-        CredentialsDto credentials = new CredentialsDto();
+        EmailCredentialsDto credentials = new EmailCredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
         return signInWithEmail(credentials);
@@ -147,7 +147,7 @@ public class GoTrueApi {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signInWithEmail(EmailCredentialsDto credentials) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=password", url);
 
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlToken);
@@ -162,7 +162,7 @@ public class GoTrueApi {
      * @throws ApiException
      */
     public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
-        CredentialsDto credentials = new CredentialsDto();
+        EmailCredentialsDto credentials = new EmailCredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
         return signUpWithEmail(credentials);
@@ -175,7 +175,7 @@ public class GoTrueApi {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signUpWithEmail(EmailCredentialsDto credentials) throws ApiException {
         String urlSignup = String.format("%s/signup", url);
 
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
