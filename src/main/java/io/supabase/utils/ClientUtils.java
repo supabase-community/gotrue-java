@@ -22,25 +22,6 @@ public class ClientUtils {
     }
 
     /**
-     * Tries to open a given url in the default browser.
-     *
-     * @param url to be opened.
-     * @return whether it could open the url.
-     */
-    public static boolean openUrl(String url) {
-        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            try {
-                desktop.browse(new URL(url).toURI());
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Gets the GoTrue Url if specified.
      *
      * @return the specified GoTrue Url either from the environment or from the properties

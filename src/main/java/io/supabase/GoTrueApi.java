@@ -134,7 +134,7 @@ public class GoTrueApi {
      * @throws ApiException
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
-        EmailCredentialsDto credentials = new EmailCredentialsDto();
+        CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
         return signInWithEmail(credentials);
@@ -147,7 +147,7 @@ public class GoTrueApi {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signInWithEmail(EmailCredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=password", url);
 
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlToken);
@@ -162,7 +162,7 @@ public class GoTrueApi {
      * @throws ApiException
      */
     public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
-        EmailCredentialsDto credentials = new EmailCredentialsDto();
+        CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
         return signUpWithEmail(credentials);
@@ -175,12 +175,18 @@ public class GoTrueApi {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signUpWithEmail(EmailCredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
         String urlSignup = String.format("%s/signup", url);
 
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
     }
 
+    /**
+     * Get the default headers plus the Authorization header.
+     *
+     * @param jwt the token to be added to the headers.
+     * @return the default headers plus the Authorization header.
+     */
     private Map<String, String> headersWithJWT(String jwt) {
         Map<String, String> newHeaders = new HashMap<>(headers);
         newHeaders.put("Authorization", String.format("Bearer %s", jwt));

@@ -3,7 +3,6 @@ package io.supabase;
 import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
-import io.supabase.data.resources.Credentials;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.MalformedHeadersException;
@@ -66,7 +65,7 @@ public class GoTrueClient {
      * @throws UrlNotFoundException
      * @throws MalformedHeadersException
      */
-    public static GoTrueClient I() throws UrlNotFoundException, MalformedHeadersException {
+    public static GoTrueClient i() throws UrlNotFoundException, MalformedHeadersException {
         return getInstance();
     }
 
@@ -79,6 +78,9 @@ public class GoTrueClient {
      * @throws JwtSecretNotFoundException
      */
     public ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
+        if (jwt == null || jwt.isEmpty()) {
+            throw new IllegalArgumentException("The JWT token is required!");
+        }
         return ClientUtils.parseJwt(jwt);
     }
 
@@ -91,6 +93,9 @@ public class GoTrueClient {
      * @throws JwtSecretNotFoundException
      */
     public boolean validate(String jwt) throws JwtSecretNotFoundException {
+        if (jwt == null || jwt.isEmpty()) {
+            throw new IllegalArgumentException("The JWT token is required!");
+        }
         try {
             ClientUtils.parseJwt(jwt);
             // no error -> valid
@@ -107,40 +112,14 @@ public class GoTrueClient {
      * @return Details of the current user.
      */
     public UserDto getCurrentUser() {
+        if (currentAuth == null) {
+            throw new IllegalArgumentException("You need to be logged in to use this method!");
+        }
         return currentAuth.getUser();
     }
 
     /**
-     * Logs in an existing user using either their email address or an OAuth provider.
-     *
-     * @param email    The email address of the user.
-     * @param password The password of the user.
-     * @param provider The provider of the user.
-     * @return Details about the authentication.
-     * @throws ApiException
-     */
-    public AuthenticationDto signIn(String email, String password, String provider) throws ApiException {
-        if (email != null && !email.isEmpty()) {
-            if (password != null && !password.isEmpty()) {
-                currentAuth = api.signInWithEmail(email, password);
-            } else {
-                api.magicLink(email);
-                return null;
-            }
-        } else if (provider != null && !provider.isEmpty()) {
-            String urlProvider = api.getUrlForProvider(provider);
-            if (!ClientUtils.openUrl(urlProvider)) {
-                throw new ApiException(String.format("failed to open the Provider url: %s", urlProvider));
-            }
-            return null;
-        } else {
-            throw new IllegalArgumentException("At least one of the parameters is required!");
-        }
-        return currentAuth;
-    }
-
-    /**
-     * Logs in an existing user using their email address.
+     * Logs in an existing user using either their email address and password.
      *
      * @param email    The email address of the user.
      * @param password The password of the user.
@@ -148,19 +127,11 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public AuthenticationDto signIn(String email, String password) throws ApiException {
-        return signIn(email, password, null);
-    }
-
-
-    /**
-     * Logs in an existing user using their email address to send a magic-link.
-     *
-     * @param email The email address of the user.
-     * @return Details about the authentication.
-     * @throws ApiException
-     */
-    public AuthenticationDto signIn(String email) throws ApiException {
-        return signIn(email, null, null);
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Email and password are required!");
+        }
+        currentAuth = api.signInWithEmail(email, password);
+        return currentAuth;
     }
 
     /**
@@ -170,9 +141,11 @@ public class GoTrueClient {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signIn(Credentials credentials) throws ApiException {
-        if (credentials == null) throw new IllegalArgumentException("Cannot be null!");
-        return signIn(credentials.getEmail(), credentials.getPassword(), credentials.getProvider());
+    public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
+        if (credentials == null || credentials.getEmail() == null || credentials.getPassword() == null) {
+            throw new IllegalArgumentException("The credentials are required!");
+        }
+        return signIn(credentials.getEmail(), credentials.getPassword());
     }
 
     /**
@@ -184,6 +157,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public AuthenticationDto signUp(String email, String password) throws ApiException {
+        if (email == null || password == null) {
+            throw new IllegalArgumentException("Email and password are required!");
+        }
         currentAuth = api.signUpWithEmail(email, password);
         return currentAuth;
     }
@@ -195,7 +171,10 @@ public class GoTrueClient {
      * @return Details about the authentication.
      * @throws ApiException
      */
-    public AuthenticationDto signUp(EmailCredentialsDto credentials) throws ApiException {
+    public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
+        if (credentials == null || credentials.getEmail() == null || credentials.getPassword() == null) {
+            throw new IllegalArgumentException("The credentials are required!");
+        }
         currentAuth = api.signUpWithEmail(credentials);
         return currentAuth;
     }
@@ -208,7 +187,12 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public UserUpdatedDto update(UserAttributesDto attributes) throws ApiException {
-        if (currentAuth == null) return null;
+        if (currentAuth == null) {
+            throw new IllegalArgumentException("You need to be logged in to use this method!");
+        }
+        if (attributes == null) {
+            throw new IllegalArgumentException("The attributes are required!");
+        }
         return api.updateUser(currentAuth.getAccessToken(), attributes);
     }
 
@@ -221,7 +205,12 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws ApiException {
-        if (jwt == null) return null;
+        if (jwt == null || jwt.isEmpty()) {
+            throw new IllegalArgumentException("The JWT token is required!");
+        }
+        if (attributes == null) {
+            throw new IllegalArgumentException("The attributes are required!");
+        }
         return api.updateUser(jwt, attributes);
     }
 
@@ -231,7 +220,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public void signOut() throws ApiException {
-        if (currentAuth == null) return;
+        if (currentAuth == null) {
+            throw new IllegalArgumentException("You need to be logged in order to log out!");
+        }
         api.signOut(currentAuth.getAccessToken());
     }
 
@@ -242,8 +233,10 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public void signOut(String jwt) throws ApiException {
-        if (jwt == null) return;
-        api.signOut(currentAuth.getAccessToken());
+        if (jwt == null || jwt.isEmpty()) {
+            throw new IllegalArgumentException("The JWT token is required!");
+        }
+        api.signOut(jwt);
     }
 
     /**
@@ -263,6 +256,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public AuthenticationDto refresh() throws ApiException {
+        if (currentAuth == null) {
+            throw new IllegalArgumentException("You need to be logged in to use this method!");
+        }
         return api.refreshAccessToken(currentAuth.getRefreshToken());
     }
 
@@ -274,6 +270,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public UserDto getUser(String jwt) throws ApiException {
+        if (jwt == null || jwt.isEmpty()) {
+            throw new IllegalArgumentException("The JWT token is required!");
+        }
         return api.getUser(jwt);
     }
 
@@ -286,6 +285,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public AuthenticationDto refresh(String refreshToken) throws ApiException {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new IllegalArgumentException("The refresh token is required!");
+        }
         return api.refreshAccessToken(refreshToken);
     }
 
@@ -296,6 +298,9 @@ public class GoTrueClient {
      * @throws ApiException
      */
     public void recover(String email) throws ApiException {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("The email is required!");
+        }
         api.recoverPassword(email);
     }
 }

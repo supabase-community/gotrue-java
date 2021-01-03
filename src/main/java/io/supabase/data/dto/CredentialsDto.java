@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EmailCredentialsDto {
+public class CredentialsDto {
     @JsonProperty("email")
     String email;
     @JsonProperty("password")

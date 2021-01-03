@@ -62,7 +62,7 @@ class GoTrueApiTest {
 
     @Test
     void signUpWithEmail_credentials() {
-        EmailCredentialsDto credentials = new EmailCredentialsDto();
+        CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail("email@example.com");
         credentials.setPassword("secret");
 
@@ -108,7 +108,7 @@ class GoTrueApiTest {
             api.signUpWithEmail("email@example.com", "secret");
 
             // login with said user
-            EmailCredentialsDto credentials = new EmailCredentialsDto();
+            CredentialsDto credentials = new CredentialsDto();
             credentials.setEmail("email@example.com");
             credentials.setPassword("secret");
             r = api.signInWithEmail(credentials);

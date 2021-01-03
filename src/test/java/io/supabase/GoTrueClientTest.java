@@ -3,7 +3,6 @@ package io.supabase;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
-import io.supabase.data.resources.Credentials;
 import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.JwtSecretNotFoundException;
 import io.supabase.exceptions.MalformedHeadersException;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;
 import org.springframework.web.client.RestTemplate;
 
-import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -174,8 +172,15 @@ class GoTrueClientTest {
     }
 
     @Test
+    void signUpWithEmail_nulls() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(null, "secret"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp("example@domain.com", null));
+    }
+
+    @Test
     void signUpWithEmail_credentials() {
-        EmailCredentialsDto credentials = new EmailCredentialsDto();
+        CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail("email@example.com");
         credentials.setPassword("secret");
 
@@ -189,13 +194,29 @@ class GoTrueClientTest {
     }
 
     @Test
+    void signUpWithEmail_credentials_nulls() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setEmail(null);
+        credentials.setPassword(null);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp((CredentialsDto) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
+        credentials.setEmail("example@domain.com");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
+        credentials.setEmail(null);
+        credentials.setPassword("secret");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
+
+    }
+
+    @Test
     void signInWithEmail() {
         AuthenticationDto r = null;
         try {
             // create a user
             client.signUp("email@example.com", "secret");
             // login with said user
-            r = client.signIn("email@example.com", "secret", null);
+            r = client.signIn("email@example.com", "secret");
         } catch (ApiException e) {
             Assertions.fail();
         }
@@ -203,8 +224,15 @@ class GoTrueClientTest {
     }
 
     @Test
+    void signInWithEmail_nulls() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("example@domain.com", null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, "secret"));
+    }
+
+    @Test
     void signInWithEmail_credentials() {
-        EmailCredentialsDto credentials = new EmailCredentialsDto();
+        CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail("email@example.com");
         credentials.setPassword("secret");
 
@@ -213,11 +241,26 @@ class GoTrueClientTest {
             // create a user
             client.signUp(credentials);
             // login with said user
-            r = client.signIn(credentials.getEmail(), credentials.getPassword());
+            r = client.signIn(credentials);
         } catch (ApiException e) {
             Assertions.fail();
         }
         Utils.assertAuthDto(r);
+    }
+
+    @Test
+    void signInWithEmail_credentials_nulls() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setEmail(null);
+        credentials.setPassword(null);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn((CredentialsDto) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
+        credentials.setEmail("example@domain.com");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
+        credentials.setEmail(null);
+        credentials.setPassword("secret");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
     }
 
     @Test
@@ -246,36 +289,21 @@ class GoTrueClientTest {
 
     @Test
     void updateUser_null() {
-        try {
-            Assertions.assertNull(client.update(null));
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-
         UserAttributesDto attr = new UserAttributesDto();
         attr.setEmail("newemail@example.com");
-        try {
-            Assertions.assertNull(client.update(attr));
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-    }
+        // not logged in
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(attr));
 
-    @Test
-    void updateUser_null_null() {
+        // create a user
         try {
-            Assertions.assertNull(client.update(null, null));
+            client.signUp("email@example.com", "secret");
         } catch (ApiException e) {
-            e.printStackTrace();
+            Assertions.fail();
         }
 
-        UserAttributesDto attr = new UserAttributesDto();
-        attr.setEmail("newemail@example.com");
-        try {
-            Assertions.assertNull(client.update(null, attr));
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(null));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(null, null));
     }
 
     @Test
@@ -317,8 +345,8 @@ class GoTrueClientTest {
     @Test
     void signOut_null() {
         // not logged in
-        Assertions.assertDoesNotThrow(() -> client.signOut());
-        Assertions.assertDoesNotThrow(() -> client.signOut(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signOut());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signOut(null));
     }
 
 
@@ -398,6 +426,12 @@ class GoTrueClientTest {
     }
 
     @Test
+    void refresh_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.refresh(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.refresh());
+    }
+
+    @Test
     void getUser() {
         // create a user to get a valid JWT
         AuthenticationDto r = null;
@@ -425,6 +459,12 @@ class GoTrueClientTest {
     }
 
     @Test
+    void getUser_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.getUser(null));
+    }
+
+
+    @Test
     void getCurrentUser() {
         // create a user
         AuthenticationDto r = null;
@@ -435,6 +475,11 @@ class GoTrueClientTest {
         }
         UserDto user = client.getCurrentUser();
         Assertions.assertEquals(r.getUser(), user);
+    }
+
+    @Test
+    void getCurrentUser_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.getCurrentUser());
     }
 
     @Test
@@ -452,13 +497,13 @@ class GoTrueClientTest {
     @Test
     void I() {
         // no url specified
-        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::I);
+        Assertions.assertThrows(UrlNotFoundException.class, GoTrueClient::i);
     }
 
     @Test
     void I_url() {
         System.setProperty("gotrue.url", url);
-        Assertions.assertDoesNotThrow(GoTrueClient::I);
+        Assertions.assertDoesNotThrow(GoTrueClient::i);
     }
 
     @Test
@@ -530,6 +575,11 @@ class GoTrueClientTest {
     }
 
     @Test
+    void parseJwt_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.parseJwt(null));
+    }
+
+    @Test
     void validate() {
         // provide secret
         System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
@@ -564,6 +614,11 @@ class GoTrueClientTest {
     }
 
     @Test
+    void validate_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.validate(null));
+    }
+
+    @Test
     void recoverPassword() {
         AuthenticationDto r = null;
         try {
@@ -589,42 +644,9 @@ class GoTrueClientTest {
         }
     }
 
-    @Test
-    void signIn_magicLink() {
-        AuthenticationDto r = null;
-        try {
-            // create a user
-            r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        final AuthenticationDto finalR = r;
-        // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> client.signIn(finalR.getUser().getEmail()));
-    }
 
     @Test
-    void signIn_magicLink_no_user() {
-        // there does not already have to be an user registered with the email
-        Assertions.assertDoesNotThrow(() -> client.signIn("email@example.com"));
-    }
-
-    @Test
-    void signIn_provider() {
-        Credentials credentials = new Credentials();
-        credentials.setProvider("google");
-        // opens browser if possible otherwise throw ApiException
-        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            Assertions.assertDoesNotThrow(() -> client.signIn(credentials));
-        } else {
-            Assertions.assertThrows(ApiException.class, () -> client.signIn(credentials));
-        }
-    }
-
-    @Test
-    void signIn_no_params() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, null, null));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn((Credentials) null));
+    void recoverPassword_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.recover(null));
     }
 }
