@@ -199,7 +199,7 @@ class GoTrueClientTest {
         credentials.setEmail(null);
         credentials.setPassword(null);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp((CredentialsDto) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
         credentials.setEmail("example@domain.com");
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
@@ -254,7 +254,7 @@ class GoTrueClientTest {
         credentials.setEmail(null);
         credentials.setPassword(null);
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn((CredentialsDto) null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
         credentials.setEmail("example@domain.com");
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));

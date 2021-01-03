@@ -13,8 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -34,7 +32,7 @@ public class RestUtils {
      * @param url           the url the request will be sent to.
      * @param <R>           the type of the response.
      * @return the response of the request parsed from json to R.
-     * @throws ApiException
+     * @throws ApiException if a Exception is thrown.
      */
     public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
@@ -43,8 +41,7 @@ public class RestUtils {
         } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Put failed", e);
         } catch (JsonProcessingException e) {
-            Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
-            return null;
+            throw new ApiException("Object mapping failed", e);
         }
     }
 
@@ -56,7 +53,7 @@ public class RestUtils {
      * @param url           the url the request will be sent to.
      * @param <R>           the type of the response.
      * @return the response of the request parsed from json to R.
-     * @throws ApiException
+     * @throws ApiException if a Exception is thrown.
      */
     public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
@@ -74,7 +71,7 @@ public class RestUtils {
      *
      * @param headers the headers that will be sent with the request.
      * @param url     the url the request will be sent to.
-     * @throws ApiException
+     * @throws ApiException if a Exception is thrown.
      */
     public static void post(Map<String, String> headers, String url) throws ApiException {
         try {
@@ -91,7 +88,7 @@ public class RestUtils {
      * @param body    the body of the request, will be parsed to json.
      * @param headers the headers that will be sent with the request.
      * @param url     the url the request will be sent to.
-     * @throws ApiException
+     * @throws ApiException if a Exception is thrown.
      */
     public static void post(Object body, Map<String, String> headers, String url) throws ApiException {
         post(body, Void.class, headers, url);
@@ -106,7 +103,7 @@ public class RestUtils {
      * @param url           the url the request will be sent to.
      * @param <R>           the type of the response.
      * @return the response of the request parsed from json to R.
-     * @throws ApiException
+     * @throws ApiException if a Exception is thrown.
      */
     public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
         try {
@@ -115,8 +112,7 @@ public class RestUtils {
         } catch (RestClientResponseException | ResourceAccessException e) {
             throw new ApiException("Post failed", e);
         } catch (JsonProcessingException e) {
-            Logger.getGlobal().log(Level.WARNING, String.format("ObjectMapping failed: %s", e.getMessage()));
-            return null;
+            throw new ApiException("Object mapping failed", e);
         }
     }
 

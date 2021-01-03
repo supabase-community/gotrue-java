@@ -1,4 +1,4 @@
-# `gotrue-java WIP` ![Java CI with Maven](https://github.com/supabase/gotrue-java/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master) [![codecov](https://codecov.io/gh/supabase/gotrue-java/branch/master/graph/badge.svg?token=V2T6WRH9CB)](https://codecov.io/gh/supabase/gotrue-java)
+# `gotrue-java WIP` ![CI](https://github.com/supabase/gotrue-java/workflows/CI/badge.svg?branch=master) [![codecov](https://codecov.io/gh/supabase/gotrue-java/branch/master/graph/badge.svg?token=V2T6WRH9CB)](https://codecov.io/gh/supabase/gotrue-java)
 
 A Java client library for the [GoTrue](https://github.com/supabase/gotrue) API.
 
@@ -58,9 +58,9 @@ gotrue.jwt.secret=superSecretJwtToken
 
 - [JavaDoc](https://supabase.github.io/gotrue-java/)
 
-# Roadmap
+# ToDo
 
-- [ ] support OAuth
+- ~~[ ] support OAuth~~
 - [ ] deploy to maven
 - [ ] deploy to gradle?
 

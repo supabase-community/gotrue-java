@@ -24,7 +24,7 @@ public class GoTrueApi {
      * Send an magic-link to a given email.
      *
      * @param email the email the link should be sent to.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public void magicLink(String email) throws ApiException {
         String urlMagicLink = String.format("%s/magiclink", url);
@@ -39,7 +39,7 @@ public class GoTrueApi {
      * Send a password-recovery link to a given email.
      *
      * @param email the email a recovery link should be sent to.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public void recoverPassword(String email) throws ApiException {
         String urlRecover = String.format("%s/recover", url);
@@ -54,7 +54,7 @@ public class GoTrueApi {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public SettingsDto getSettings() throws ApiException {
         String urlSettings = String.format("%s/settings", url);
@@ -75,15 +75,15 @@ public class GoTrueApi {
     /**
      * Update a user.
      *
-     * @param jwt           A valid JWT.
-     * @param attributesDto The data you want to update
+     * @param jwt        A valid JWT.
+     * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
-    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributesDto) throws ApiException {
+    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributes) throws ApiException {
         String urlUser = String.format("%s/user", url);
 
-        return RestUtils.put(attributesDto, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
+        return RestUtils.put(attributes, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
     }
 
     /**
@@ -91,7 +91,7 @@ public class GoTrueApi {
      *
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto refreshAccessToken(String refreshToken) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=refresh_token", url);
@@ -106,7 +106,7 @@ public class GoTrueApi {
      *
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public UserDto getUser(String jwt) throws ApiException {
         String urlUser = String.format("%s/user", url);
@@ -118,10 +118,11 @@ public class GoTrueApi {
      * Removes a logged-in session.
      *
      * @param jwt A valid, logged-in JWT.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public void signOut(String jwt) throws ApiException {
         String urlLogout = String.format("%s/logout", url);
+
         RestUtils.post(headersWithJWT(jwt), urlLogout);
     }
 
@@ -131,12 +132,13 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
+
         return signInWithEmail(credentials);
     }
 
@@ -145,7 +147,7 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=password", url);
@@ -159,12 +161,13 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
+
         return signUpWithEmail(credentials);
     }
 
@@ -173,7 +176,7 @@ public class GoTrueApi {
      *
      * @param credentials Object with the email and the password of the user.
      * @return Details about the authentication.
-     * @throws ApiException
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
         String urlSignup = String.format("%s/signup", url);

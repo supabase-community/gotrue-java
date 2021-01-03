@@ -49,7 +49,7 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertDoesNotThrow(() -> RestUtils.post(a, CircularDependentA.class, null, "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> RestUtils.post(a, CircularDependentA.class, null, "http://smth/"));
     }
 
 
@@ -60,7 +60,7 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertDoesNotThrow(() -> RestUtils.post(a, CircularDependentA.class, new HashMap<>(), "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> RestUtils.post(a, CircularDependentA.class, new HashMap<>(), "http://smth/"));
     }
 
 
@@ -71,7 +71,7 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertDoesNotThrow(() -> RestUtils.put(a, CircularDependentA.class, null, "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> RestUtils.put(a, CircularDependentA.class, null, "http://smth/"));
     }
 
     @Test

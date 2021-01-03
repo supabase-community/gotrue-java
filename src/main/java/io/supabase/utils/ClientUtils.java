@@ -10,8 +10,6 @@ import io.supabase.exceptions.MalformedHeadersException;
 import io.supabase.exceptions.UrlNotFoundException;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.awt.*;
-import java.net.URL;
 import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
