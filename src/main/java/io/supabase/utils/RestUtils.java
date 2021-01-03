@@ -127,7 +127,9 @@ public class RestUtils {
     private static HttpEntity<String> toEntity(String jsonBody, Map<String, String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
         headers = (headers != null) ? headers : new HashMap<>();
-        headers.forEach(httpHeaders::add);
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         return new HttpEntity<>(jsonBody, httpHeaders);
     }
 }
