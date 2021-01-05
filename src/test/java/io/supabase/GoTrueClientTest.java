@@ -59,31 +59,7 @@ class GoTrueClientTest {
     @Test
     void constructor_url() {
         Assertions.assertDoesNotThrow(() -> new GoTrueClient(url));
-    }
-
-    @Test
-    void constructor_url_null() {
         Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient((String) null));
-    }
-
-    @Test
-    void constructor_header_null() {
-        System.setProperty("gotrue.url", url);
-        Assertions.assertDoesNotThrow(() -> new GoTrueClient((Map<String, String>) null));
-    }
-
-    @Test
-    void constructor_null_null() {
-        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(null, null));
-    }
-
-    @Test
-    void constructor_url_headers() {
-        Map<String, String> headers = new HashMap<String, String>() {{
-            put("SomeHeader", "SomeValue");
-            put("Another", "3");
-        }};
-        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url, headers));
     }
 
     @Test
@@ -93,6 +69,26 @@ class GoTrueClientTest {
             put("Another", "3");
         }};
         Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(headers));
+
+        System.setProperty("gotrue.url", url);
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient((Map<String, String>) null));
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(headers));
+    }
+
+    @Test
+    void constructor_url_headers() {
+        Assertions.assertThrows(UrlNotFoundException.class, () -> new GoTrueClient(null, null));
+
+        Map<String, String> headers = new HashMap<String, String>() {{
+            put("SomeHeader", "SomeValue");
+            put("Another", "3");
+        }};
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url, headers));
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url, null));
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(url, new HashMap<>()));
+
+        System.setProperty("gotrue.url", url);
+        Assertions.assertDoesNotThrow(() -> new GoTrueClient(null, null));
     }
 
     @Test
@@ -224,10 +220,14 @@ class GoTrueClientTest {
     }
 
     @Test
-    void signInWithEmail_nulls() {
+    void signInWithEmail_nullsEmpty() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("example@domain.com", null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null, "secret"));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("", ""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("example@domain.com", ""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("", "secret"));
     }
 
     @Test
@@ -285,10 +285,19 @@ class GoTrueClientTest {
         Utils.assertUserUpdatedDto(user);
         Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
+
+        try {
+            user = client.update(client.getCurrentAuth().getAccessToken(), attr);
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
+        Utils.assertUserUpdatedDto(user);
+        Assertions.assertNotNull(user.getUserMetadata());
+        Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
 
     @Test
-    void updateUser_null() {
+    void updateUser_nullEmpty() {
         UserAttributesDto attr = new UserAttributesDto();
         attr.setEmail("newemail@example.com");
         // not logged in
@@ -304,6 +313,8 @@ class GoTrueClientTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(null));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.update("", null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.update(client.getCurrentAuth().getAccessToken(), null));
     }
 
     @Test
@@ -343,10 +354,11 @@ class GoTrueClientTest {
     }
 
     @Test
-    void signOut_null() {
+    void signOut_nullEmpty() {
         // not logged in
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signOut());
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signOut(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signOut(""));
     }
 
 
@@ -420,15 +432,14 @@ class GoTrueClientTest {
     }
 
     @Test
-    void refresh_invalid() {
-        String token = "noValidToken";
-        Assertions.assertThrows(ApiException.class, () -> client.refresh(token));
-    }
-
-    @Test
-    void refresh_null() {
+    void refresh_nullInvalid() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.refresh(null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.refresh());
+
+        String token = "noValidToken";
+        Assertions.assertThrows(ApiException.class, () -> client.refresh(token));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.refresh(""));
     }
 
     @Test
@@ -459,8 +470,9 @@ class GoTrueClientTest {
     }
 
     @Test
-    void getUser_null() {
+    void getUser_nullEmpty() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.getUser(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.getUser(""));
     }
 
 
@@ -477,9 +489,28 @@ class GoTrueClientTest {
         Assertions.assertEquals(r.getUser(), user);
     }
 
+
     @Test
     void getCurrentUser_null() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.getCurrentUser());
+    }
+
+    @Test
+    void getCurrentAuth() {
+        // create a user
+        AuthenticationDto r = null;
+        try {
+            r = client.signUp("email@example.com", "secret");
+        } catch (ApiException e) {
+            Assertions.fail();
+        }
+
+        Assertions.assertEquals(r, client.getCurrentAuth());
+    }
+
+    @Test
+    void getCurrentAuth_null() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.getCurrentAuth());
     }
 
     @Test
@@ -575,8 +606,9 @@ class GoTrueClientTest {
     }
 
     @Test
-    void parseJwt_null() {
+    void parseJwt_nullEmpty() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.parseJwt(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.parseJwt(""));
     }
 
     @Test
@@ -614,8 +646,9 @@ class GoTrueClientTest {
     }
 
     @Test
-    void validate_null() {
+    void validate_nullEmpty() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.validate(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.validate(""));
     }
 
     @Test
@@ -646,7 +679,8 @@ class GoTrueClientTest {
 
 
     @Test
-    void recoverPassword_null() {
+    void recoverPassword_nullEmpty() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.recover(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> client.recover(""));
     }
 }

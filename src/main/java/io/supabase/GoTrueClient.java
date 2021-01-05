@@ -21,25 +21,25 @@ public class GoTrueClient {
     protected GoTrueClient(String url, Map<String, String> headers) throws UrlNotFoundException, MalformedHeadersException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
-        api = new GoTrueApi(url, headers);
+        this.api = new GoTrueApi(this.url, this.headers);
     }
 
     protected GoTrueClient(Map<String, String> headers) throws UrlNotFoundException, MalformedHeadersException {
         this.url = ClientUtils.loadUrl();
         this.headers = headers != null ? headers : ClientUtils.loadHeaders();
-        api = new GoTrueApi(url, headers);
+        this.api = new GoTrueApi(this.url, headers);
     }
 
     protected GoTrueClient(String url) throws UrlNotFoundException, MalformedHeadersException {
         this.url = url != null ? url : ClientUtils.loadUrl();
         this.headers = ClientUtils.loadHeaders();
-        api = new GoTrueApi(url, headers);
+        this.api = new GoTrueApi(url, this.headers);
     }
 
     protected GoTrueClient() throws UrlNotFoundException, MalformedHeadersException {
-        url = ClientUtils.loadUrl();
-        headers = ClientUtils.loadHeaders();
-        api = new GoTrueApi(url, headers);
+        this.url = ClientUtils.loadUrl();
+        this.headers = ClientUtils.loadHeaders();
+        this.api = new GoTrueApi(this.url, this.headers);
     }
 
 
@@ -80,9 +80,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException   if the jwt token is not specified.
      */
     public ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new IllegalArgumentException("The JWT token is required!");
-        }
+        checkParam(jwt, "jwt");
         return ClientUtils.parseJwt(jwt);
     }
 
@@ -96,9 +94,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException   if the jwt token is not specified.
      */
     public boolean validate(String jwt) throws JwtSecretNotFoundException {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new IllegalArgumentException("The JWT token is required!");
-        }
+        checkParam(jwt, "jwt");
         try {
             ClientUtils.parseJwt(jwt);
             // no error -> valid
@@ -116,10 +112,20 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if you are currently not logged in.
      */
     public UserDto getCurrentUser() {
-        if (currentAuth == null) {
-            throw new IllegalArgumentException("You need to be logged in to use this method!");
-        }
+        checkAuthState();
         return currentAuth.getUser();
+    }
+
+
+    /**
+     * Gets the current authentication details.
+     *
+     * @return Details of the current authentication.
+     * @throws IllegalArgumentException if you are currently not logged in.
+     */
+    public AuthenticationDto getCurrentAuth() {
+        checkAuthState();
+        return currentAuth;
     }
 
     /**
@@ -132,9 +138,8 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the either or both email and password are not specified.
      */
     public AuthenticationDto signIn(String email, String password) throws ApiException {
-        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Email and password are required!");
-        }
+        checkParam(email, "email");
+        checkParam(password, "password");
         currentAuth = api.signInWithEmail(email, password);
         return currentAuth;
     }
@@ -148,9 +153,9 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the the credentials are not specified.
      */
     public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
-        if (credentials == null || credentials.getEmail() == null || credentials.getPassword() == null) {
-            throw new IllegalArgumentException("The credentials are required!");
-        }
+        checkParam(credentials, "credentials");
+        checkParam(credentials.getEmail(), "credentials.email");
+        checkParam(credentials.getPassword(), "credentials.password");
         return signIn(credentials.getEmail(), credentials.getPassword());
     }
 
@@ -164,9 +169,8 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the either or both email and password are not specified.
      */
     public AuthenticationDto signUp(String email, String password) throws ApiException {
-        if (email == null || password == null) {
-            throw new IllegalArgumentException("Email and password are required!");
-        }
+        checkParam(email, "email");
+        checkParam(password, "password");
         currentAuth = api.signUpWithEmail(email, password);
         return currentAuth;
     }
@@ -180,9 +184,9 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the the credentials are not specified.
      */
     public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
-        if (credentials == null || credentials.getEmail() == null || credentials.getPassword() == null) {
-            throw new IllegalArgumentException("The credentials are required!");
-        }
+        checkParam(credentials, "credentials");
+        checkParam(credentials.getEmail(), "credentials.email");
+        checkParam(credentials.getPassword(), "credentials.password");
         currentAuth = api.signUpWithEmail(credentials);
         return currentAuth;
     }
@@ -197,12 +201,8 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the attributes are not specified.
      */
     public UserUpdatedDto update(UserAttributesDto attributes) throws ApiException {
-        if (currentAuth == null) {
-            throw new IllegalArgumentException("You need to be logged in to use this method!");
-        }
-        if (attributes == null) {
-            throw new IllegalArgumentException("The attributes are required!");
-        }
+        checkAuthState();
+        checkParam(attributes, "attributes");
         return api.updateUser(currentAuth.getAccessToken(), attributes);
     }
 
@@ -217,12 +217,8 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the attributes are not specified.
      */
     public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws ApiException {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new IllegalArgumentException("The JWT token is required!");
-        }
-        if (attributes == null) {
-            throw new IllegalArgumentException("The attributes are required!");
-        }
+        checkParam(jwt, "jwt");
+        checkParam(attributes, "attributes");
         return api.updateUser(jwt, attributes);
     }
 
@@ -233,9 +229,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if you are currently not logged in.
      */
     public void signOut() throws ApiException {
-        if (currentAuth == null) {
-            throw new IllegalArgumentException("You need to be logged in order to log out!");
-        }
+        checkAuthState();
         api.signOut(currentAuth.getAccessToken());
     }
 
@@ -247,9 +241,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
     public void signOut(String jwt) throws ApiException {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new IllegalArgumentException("The JWT token is required!");
-        }
+        checkParam(jwt, "jwt");
         api.signOut(jwt);
     }
 
@@ -257,7 +249,7 @@ public class GoTrueClient {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public SettingsDto settings() throws ApiException {
         return api.getSettings();
@@ -271,9 +263,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if you are currently not logged in.
      */
     public AuthenticationDto refresh() throws ApiException {
-        if (currentAuth == null) {
-            throw new IllegalArgumentException("You need to be logged in to use this method!");
-        }
+        checkAuthState();
         return api.refreshAccessToken(currentAuth.getRefreshToken());
     }
 
@@ -286,9 +276,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
     public UserDto getUser(String jwt) throws ApiException {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new IllegalArgumentException("The JWT token is required!");
-        }
+        checkParam(jwt, "jwt");
         return api.getUser(jwt);
     }
 
@@ -302,9 +290,7 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the refresh token is not specified.
      */
     public AuthenticationDto refresh(String refreshToken) throws ApiException {
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new IllegalArgumentException("The refresh token is required!");
-        }
+        checkParam(refreshToken, "refreshToken");
         return api.refreshAccessToken(refreshToken);
     }
 
@@ -316,9 +302,22 @@ public class GoTrueClient {
      * @throws IllegalArgumentException if the email is not specified.
      */
     public void recover(String email) throws ApiException {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("The email is required!");
-        }
+        checkParam(email, "email");
         api.recoverPassword(email);
+    }
+
+    private void checkAuthState() {
+        if (currentAuth == null) {
+            throw new IllegalArgumentException("You need to be logged in to use this method!");
+        }
+    }
+
+    private void checkParam(Object obj, String name) {
+        boolean invalid = obj == null;
+        if (!invalid && obj instanceof String) {
+            String s = (String) obj;
+            invalid = s.isEmpty();
+        }
+        if (invalid) throw new IllegalArgumentException(String.format("The parameter >%s< is required!", name));
     }
 }
