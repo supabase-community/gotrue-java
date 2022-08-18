@@ -24,9 +24,9 @@ public class UserDto {
     @JsonProperty("last_sign_in_at")
     Date lastSignInAt;
     @JsonProperty("app_metadata")
-    Map<String, String> appMetadata;
+    Map<String, Object> appMetadata;
     @JsonProperty("user_metadata")
-    Map<String, String> userMetadata;
+    Map<String, Object> userMetadata;
     @JsonProperty("created_at")
     Date createdAt;
     @JsonProperty("updated_at")
