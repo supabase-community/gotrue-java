@@ -18,99 +18,29 @@ public class RestUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final RestTemplate rest = new RestTemplate();
 
-
     private RestUtils() {
     }
 
-
     /**
-     * Sends a Put request.
+     * Sends an HTTP request.
      *
-     * @param body          the body of the request, will be parsed to json.
+     * @param method        the HTTP method (GET, POST, PUT, DELETE, etc.).
+     * @param body          the body of the request, will be parsed to JSON.
      * @param responseClass the class of the response.
      * @param headers       the headers that will be sent with the request.
-     * @param url           the url the request will be sent to.
+     * @param url           the URL the request will be sent to.
      * @param <R>           the type of the response.
-     * @return the response of the request parsed from json to R.
-     * @throws ApiException if a Exception is thrown.
+     * @return the response of the request parsed from JSON to R.
+     * @throws ApiException if an exception is thrown.
      */
-    public static <R> R put(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
+    public static <R> R sendRequest(HttpMethod method, Object body, Class<R> responseClass,
+                                    Map<String, String> headers, String url) throws ApiException {
         try {
             HttpEntity<String> entity = toEntity(body, headers);
-            return rest.exchange(url, HttpMethod.PUT, entity, responseClass).getBody();
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            throw new ApiException("Put failed", e);
-        } catch (JsonProcessingException e) {
-            throw new ApiException("Object mapping failed", e);
-        }
-    }
-
-    /**
-     * Sends a Get request.
-     *
-     * @param responseClass the class of the response.
-     * @param headers       the headers that will be sent with the request.
-     * @param url           the url the request will be sent to.
-     * @param <R>           the type of the response.
-     * @return the response of the request parsed from json to R.
-     * @throws ApiException if a Exception is thrown.
-     */
-    public static <R> R get(Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
-        try {
-            HttpEntity<String> entity = toEntity(headers);
-            ResponseEntity<R> res = rest.exchange(url, HttpMethod.GET, entity, responseClass);
+            ResponseEntity<R> res = rest.exchange(url, method, entity, responseClass);
             return res.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
-            throw new ApiException("Get failed", e);
-        }
-    }
-
-
-    /**
-     * Sends a Post request.
-     *
-     * @param headers the headers that will be sent with the request.
-     * @param url     the url the request will be sent to.
-     * @throws ApiException if a Exception is thrown.
-     */
-    public static void post(Map<String, String> headers, String url) throws ApiException {
-        try {
-            HttpEntity<String> entity = toEntity(headers);
-            rest.postForObject(url, entity, Void.class);
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            throw new ApiException("Post failed", e);
-        }
-    }
-
-    /**
-     * Sends a Post request.
-     *
-     * @param body    the body of the request, will be parsed to json.
-     * @param headers the headers that will be sent with the request.
-     * @param url     the url the request will be sent to.
-     * @throws ApiException if a Exception is thrown.
-     */
-    public static void post(Object body, Map<String, String> headers, String url) throws ApiException {
-        post(body, Void.class, headers, url);
-    }
-
-    /**
-     * Sends a Post request.
-     *
-     * @param body          the body of the request, will be parsed to json.
-     * @param responseClass the class of the response.
-     * @param headers       the headers that will be sent with the request.
-     * @param url           the url the request will be sent to.
-     * @param <R>           the type of the response.
-     * @return the response of the request parsed from json to R.
-     * @throws ApiException if a Exception is thrown.
-     */
-    public static <R> R post(Object body, Class<R> responseClass, Map<String, String> headers, String url) throws ApiException {
-        try {
-            HttpEntity<String> entity = toEntity(body, headers);
-            return rest.postForObject(url, entity, responseClass);
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            throw new ApiException("Post failed", e);
+            throw new ApiException(method + " request failed", e);
         } catch (JsonProcessingException e) {
             throw new ApiException("Object mapping failed", e);
         }
